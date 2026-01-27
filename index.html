@@ -1,0 +1,919 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kitchen Scale LCD Demo – v3</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dseg@0.46.0/css/dseg.css">
+
+  <style>
+    body{
+      margin:0; background:#0f0f12; color:#eaeaea;
+      font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans TC", Arial, sans-serif;
+      display:grid; place-items:center; min-height:100vh;
+    }
+    .wrap{ width:min(1100px, 96vw); display:grid; gap:14px; justify-items:center; }
+    .device{
+      position:relative;
+      width:100%;
+      aspect-ratio: 1118 / 339;
+      border-radius: 999px;
+      overflow:hidden;
+      box-shadow: 0 18px 60px rgba(0,0,0,.55);
+      background:#111;
+      user-select:none;
+    }
+    .bg{
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      object-fit:cover;
+      pointer-events:none;
+      -webkit-user-drag:none;
+    }
+
+    .overlay{
+      position:absolute; inset:0;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .segWhite{
+      color:#fff;
+      font-family: "DSEG7 Classic", ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+      letter-spacing: .02em;
+      text-shadow: 0 0 10px rgba(255,255,255,.12);
+    }
+    .segGreen{
+      color:#2ff0d2;
+      font-family: "DSEG7 Classic", ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+      letter-spacing: .02em;
+      text-shadow: 0 0 12px rgba(47,240,210,.25);
+    }
+
+    /* ===== 你原本的定位（保持不動） ===== */
+    .liveValue{
+      position:absolute;
+      left: 35.0%;
+      top: 30.0%;
+      width: 43.0%;
+      height: 44%;
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      padding-right: 3.8%;
+      box-sizing:border-box;
+    }
+    .liveValue span{ font-size: clamp(80px, 6.4vw, 92px); line-height:1; }
+
+    .liveUnit{
+      position:absolute;
+      left: 35.0%;
+      top: 65.2%;
+      width: 43.0%;
+      display:flex;
+      justify-content:flex-end;
+      padding-right: 4.2%;
+      box-sizing:border-box;
+      font-size: clamp(30px, 1.4vw, 18px);
+      opacity:.95;
+      color:#fff;
+    }
+
+    .tareIcon00{
+     position:absolute;
+
+     /* 先放在 liveUnit 左側附近（你之後再微調 left/top） */
+     left: 55.0%;
+     top: 70.7%;
+
+     width: clamp(20px, 3vw, 40px);
+     height: auto;
+
+     opacity: 0;
+     pointer-events:none;
+    }
+
+    .tareIcon00 img{
+      width: 80%;
+      height: auto;
+      display:block;
+    }
+
+
+
+    .recValue{
+      position:absolute;
+      left: 22.8%;
+      top: 43.0%;
+      width: 25.0%;
+      height: 33%;
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      padding-right: 1.0%;
+      box-sizing:border-box;
+    }
+    .recValue span{ font-size: clamp(60px, 4.5vw, 64px); line-height:1; }
+
+    .ingredientNo{
+      position:absolute;
+      left: 43.5%;
+      top: 28.0%;
+      width: 6%;
+      text-align:left;
+      font-weight:800;
+      font-variant-numeric: tabular-nums;
+      color:#2ff0d2;
+      font-size: clamp(20px, 1.6vw, 22px);
+      opacity:.95;
+    }
+
+    .latestUnderline{
+      position:absolute;
+      left: 43.0%;
+      top: 38.0%;
+      width: 4.0%;
+      height: 0.9%;
+      background:#2ff0d2;
+      border-radius: 999px;
+      box-shadow: 0 0 10px rgba(47,240,210,.25);
+      opacity: 0;
+    }
+
+    .recUnit{
+      position:absolute;
+      left: 22.8%;
+      top: 67.2%;
+      width: 25.0%;
+      display:flex;
+      justify-content:flex-end;
+      padding-right: 1.0%;
+      box-sizing:border-box;
+      font-size: clamp(20px, 1.4vw, 18px);
+      color:#2ff0d2;
+      opacity:.95;
+    }
+
+    /* ===== V3：5個 tare icon 排列（大概位置：INGREDIENT 上方） ===== */
+    .tareRow{
+      position:absolute;
+      left: 25.5%;
+      top: 24.0%;
+      display:flex;
+      gap: 4%;
+      align-items:center;
+      pointer-events:none;
+    }
+    .tareRow img{
+     width: clamp(20px, 2.5vw, 30px);
+     height: auto;
+     display: block;
+     opacity: 0;
+     visibility: visible;
+  }
+    .tareRow img.show{
+      opacity: 1;
+      visibility: visible;
+    }
+    .ingreIcon{
+     position:absolute;
+    left: 25.5%;
+    top: 33.0%;
+
+    /* ✅ clamp 控制尺寸：最小/跟著螢幕/最大 */
+    width: clamp(120px, 15vw, 180px);
+    height: auto;
+
+    opacity: 1;
+    transition: opacity .15s ease;
+    pointer-events:none;
+    }
+
+    /* 暗掉狀態（你想要更暗也可以改成 0.15 或直接 0 隱藏） */
+    .ingreIcon.dim{
+     opacity: 0;
+    }
+
+    /* 熱區按鈕 */
+    .hotspot{
+      position:absolute;
+      z-index: 10;
+      border-radius: 999px;
+      background: rgba(255,255,255,0);
+      cursor:pointer;
+      border:none;
+      outline:none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .hotspot:active{ background: rgba(255,255,255,.10); }
+    .hotspot.show{
+      background: rgba(0,170,255,.18);
+      box-shadow: inset 0 0 0 2px rgba(0,170,255,.28);
+    }
+
+    .controls{
+      width:min(980px, 96vw);
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      opacity:.95;
+    }
+    .controls .left{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .field{
+      display:flex; gap:8px; align-items:center;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 14px;
+      padding: 10px 12px;
+    }
+    input[type="number"]{
+      width: 140px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.25);
+      color:#fff;
+      font-size: 14px;
+    }
+    .btn{
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.08);
+      color:#eee;
+      padding: 10px 12px;
+      border-radius: 14px;
+      cursor:pointer;
+    }
+    .btn:hover{ background: rgba(255,255,255,.12); }
+    .hint{ font-size: 12px; opacity:.85; }
+    code{ background: rgba(255,255,255,.08); padding: 2px 6px; border-radius: 10px; }
+
+    .versionTag{
+      position: fixed;
+      top: 12px;
+      right: 14px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.55);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .04em;
+      z-index: 9999;
+      opacity: .75;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="versionTag">v3</div>
+
+    <div class="device" id="device">
+      <img class="bg" src="ui.png" alt="UI" />
+
+      <div class="overlay" id="overlay">
+        <div class="latestUnderline" id="latestUnderline"></div>
+        <div class="ingredientNo" id="ingredientNo"></div>
+
+        <!-- V3：tare icon row -->
+        <div class="tareRow" id="tareRow">
+          <img id="tareI1" src="tare-icon01.png" alt="tare 01">
+          <img id="tareI2" src="tare-icon02.png" alt="tare 02">
+          <img id="tareI3" src="tare-icon03.png" alt="tare 03">
+          <img id="tareI4" src="tare-icon04.png" alt="tare 04">
+          <img id="tareI5" src="tare-icon05.png" alt="tare 05">
+        </div>
+
+        <img id="ingreIcon" class="ingreIcon" src="ingre-icon.png" alt="INGREDIENT">
+
+        <div class="recValue"><span class="segGreen" id="recValue"></span></div>
+        <div class="recUnit" id="recUnit"></div>
+
+        <div class="liveValue"><span class="segWhite" id="liveValue">0</span></div>
+        <div class="tareIcon00" id="tareIcon00">
+          <img src="tare-icon00.png" alt="tare00">
+        </div>
+        <div class="liveUnit" id="liveUnit">g</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="left">
+        <div class="field">
+          <span class="hint" id="txtSim">模擬秤重（輸入後按 Enter，單位以 <code>g</code> 為基準）</span>
+          <input id="weightInput" type="number" step="1" min="0" placeholder="例如 80" />
+        </div>
+        <button class="btn" id="toggleHotspots">顯示/隱藏按鈕熱區</button>
+        <button class="btn" id="toggleLang">EN</button>
+        <button class="btn" id="toggleAllOn">Check</button>
+      </div>
+      <div class="hint" id="txtHint">
+        V3：⬆/⬇ 瀏覽、<code>T</code> 短按=儲存重量、<code>T</code> 長按1.5秒=Tare(最多記5次)、<code>U</code> 切單位、<code>U</code> 長按2秒開關機
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const BASE_W = 1118, BASE_H = 339;
+  const pct = (x, base) => (x / base) * 100;
+
+  // 你原本的熱區位置（保持不動）
+  const BUTTONS = [
+    { id:"up",   label:"UP",   x: 105,  y: 40,  w: 100, h: 100, longPressMs: 2000 },
+    { id:"down", label:"DOWN", x: 105,  y: 190, w: 100, h: 100, longPressMs: 2000 },
+    { id:"tare", label:"TARE(ADD/TARE)", x: 910, y: 40,  w: 100, h: 100, longPressMs: 1500 },
+    { id:"unit", label:"UNIT/POWER",     x: 910, y: 190, w: 100, h: 100, longPressMs: 2000 },
+  ];
+
+  const UNITS = ["g", "lb oz", "lb", "oz", "fl.oz", "ml"];
+
+  // records:
+  // - {type:"tare", stage:number}   // 顯示 ingredient=00、不顯示recValue/recUnit
+  // - {type:"weight", stage:number, seq:number, weightG:number, unit:string}
+  const state = {
+    on: true,
+    unit: "g",
+    rawWeightG: 0,
+    tareOffsetG: 0,
+
+    lang: "en",
+
+    allOnPreview: false,
+
+    tare00On: false,
+
+    // V3：第幾次 tare（0~5）
+    tareStage: 0,
+
+    // V3：每個 stage 內的 ingredient 計數（從01開始）
+    seqInStage: 0,
+
+    records: [],
+    viewIndex: -1,
+
+    hotspotsVisible: false,
+
+    ingreEnabled: true,
+
+    deleteMode: false,
+    deleteAllMode: false,
+    deleteChoiceYes: true,
+  };
+
+  const device = document.getElementById("device");
+  const liveValueEl = document.getElementById("liveValue");
+  const ingreIconEl = document.getElementById("ingreIcon");
+  const liveUnitEl = document.getElementById("liveUnit");
+  const recValueEl = document.getElementById("recValue");
+  const recUnitEl = document.getElementById("recUnit");
+  const tareIcon00El = document.getElementById("tareIcon00");
+  const ingredientNoEl = document.getElementById("ingredientNo");
+  const latestUnderlineEl = document.getElementById("latestUnderline");
+  const weightInput = document.getElementById("weightInput");
+  const toggleAllOnBtn = document.getElementById("toggleAllOn");
+  const toggleHotspotsBtn = document.getElementById("toggleHotspots");
+  const toggleLangBtn = document.getElementById("toggleLang");
+  const txtSimEl = document.getElementById("txtSim");
+  const txtHintEl = document.getElementById("txtHint");
+
+  console.log("toggleLangBtn", toggleLangBtn);
+  console.log("txtSimEl", txtSimEl);
+  console.log("txtHintEl", txtHintEl);
+
+  const tareImgs = [
+    document.getElementById("tareI1"),
+    document.getElementById("tareI2"),
+    document.getElementById("tareI3"),
+    document.getElementById("tareI4"),
+    document.getElementById("tareI5"),
+  ];
+
+  const clamp0 = (n) => Math.max(0, n);
+  const latestIndex = () => state.records.length - 1;
+  const isViewingLatest = () => state.viewIndex === latestIndex();
+  const pad2 = (n) => String(n).padStart(2, "0");
+
+  function unitConvertFromG(valueG, unit){
+    switch(unit){
+      case "g": return valueG;
+      case "lb": return valueG / 453.59237;
+      case "oz": return valueG / 28.349523125;
+      case "lb oz": return valueG / 28.349523125; // total oz
+      case "fl.oz": return (valueG /*ml*/ ) / 29.5735295625; // 簡化：1g=1ml
+      case "ml": return valueG; // 簡化：1g=1ml
+      default: return valueG;
+    }
+  }
+
+  // g/ml 最小單位 1：顯示整數
+  function formatValueByUnit(valueG, unit){
+    const v = unitConvertFromG(valueG, unit);
+    if(unit === "g" || unit === "ml") return String(Math.round(v));
+
+    if(unit === "lb oz"){
+      const totalOz = v;
+      const lb = Math.floor(totalOz / 16);
+      const oz = totalOz - lb * 16;
+      return `${lb} ${oz.toFixed(2)}`;
+    }
+    return v.toFixed(2);
+  }
+
+  function getNetWeightG(){
+    return clamp0(state.rawWeightG - state.tareOffsetG);
+  }
+
+  function showTareStageIcon(stage){
+    tareImgs.forEach((img, idx) => {
+      img.classList.toggle("show", (idx + 1) === stage);
+    });
+  }
+
+const I18N = {
+  zh: {
+    toggleHotspots: "顯示/隱藏按鈕熱區",
+    sim: '模擬秤重（輸入後按 Enter，單位以 <code>g</code> 為基準）',
+    hint: 'V3：⬆/⬇ 瀏覽、<code>T</code> 短按=儲存重量、<code>T</code> 長按1.5秒=Tare(最多記5次)、<code>U</code> 切單位、<code>U</code> 長按2秒開關機'
+  },
+  en: {
+    toggleHotspots: "Show/Hide hotspots",
+    sim: 'Simulated weight (press Enter to apply, base unit: <code>g</code>)',
+    hint: 'V3: ⬆/⬇ view list, <code>T</code> short press = save, <code>T</code> long press 1.5s = tare (max 5 recorded), <code>U</code> change unit, <code>U</code> long press 2s = power'
+  }
+};
+
+function applyLanguage(){
+  const t = I18N[state.lang];
+
+  // 按鈕文字
+  toggleHotspotsBtn.textContent = t.toggleHotspots;
+
+  // 這兩段含 <code>，用 innerHTML 才能保留樣式
+  txtSimEl.innerHTML = t.sim;
+  txtHintEl.innerHTML = t.hint;
+
+  // 語言切換按鈕顯示下一個語言
+  toggleLangBtn.textContent = (state.lang === "en") ? "中文" : "EN";
+}
+
+  function render(){
+
+if(state.allOnPreview){
+    // 右側
+    liveValueEl.textContent = "8888";
+    liveUnitEl.textContent = "g";
+
+    // 左側（隨便給一組值方便看）
+    ingredientNoEl.textContent = "88";
+    ingredientNoEl.style.opacity = 0.95;
+    recValueEl.textContent = "8888";
+    recUnitEl.textContent = "g";
+
+    // 底線顯示
+    latestUnderlineEl.style.opacity = 1;
+
+    // ingre-icon 一定亮
+    ingreIconEl.style.opacity = 1;
+
+    // tare icon row：先全部顯示（你要對位）
+    tareImgs.forEach(img => img.classList.add("show"));
+
+    // tare-icon00 也顯示
+    tareIcon00El.style.opacity = 1;
+
+    return;
+  }
+
+    if(!state.on){
+      liveValueEl.textContent = "";
+      liveUnitEl.textContent = "";
+      ingredientNoEl.textContent = "";
+      recValueEl.textContent = "";
+      recUnitEl.textContent = "";
+      latestUnderlineEl.style.opacity = 0;
+      showTareStageIcon(0);
+      ingreIconEl.style.opacity = 0;
+      tareIcon00El.style.opacity = 0;
+
+      return;
+    }
+   
+
+
+    // INGREDIENT icon 亮/暗
+    ingreIconEl.style.opacity = state.ingreEnabled ? 1 : 0;
+
+    // IngredientNo「暗」的呈現：當 ingreEnabled=false 時，讓字也暗一點（你也可改成直接清空）
+    ingredientNoEl.style.opacity = state.ingreEnabled ? 0.95 : 0;
+
+    // Right
+    const netG = getNetWeightG();
+
+    tareIcon00El.style.opacity = (!state.ingreEnabled && state.tare00On) ? 1 : 0;
+    
+    if(state.deleteMode || state.deleteAllMode){
+     liveValueEl.textContent = state.deleteChoiceYes ? "YES→" : "NO→";
+     liveUnitEl.textContent = "";
+    } else {
+     liveValueEl.textContent = formatValueByUnit(netG, state.unit);
+     liveUnitEl.textContent = state.unit;
+    }
+
+    // Tare icon row：如果正在瀏覽某筆紀錄，就顯示那筆紀錄所屬的 stage；否則顯示目前最新 stage
+   let iconStageToShow = state.tareStage;
+
+   if(state.viewIndex >= 0 && state.viewIndex < state.records.length){
+    const rec = state.records[state.viewIndex];
+
+    // 若這筆就是 tare 記錄：顯示它自己的 stage（1~5）
+    if(rec.type === "tare"){
+     iconStageToShow = rec.stage;
+    }
+
+    // 若這筆是 weight 記錄：顯示它所在的 stage（0~5）
+    if(rec.type === "weight"){
+     iconStageToShow = rec.stage;
+    }
+  }
+
+  showTareStageIcon(iconStageToShow);
+
+    // Left
+    if(state.viewIndex >= 0 && state.viewIndex < state.records.length){
+      const rec = state.records[state.viewIndex];
+
+      if(rec.type === "tare"){
+        ingredientNoEl.textContent = "00";
+        recValueEl.textContent = "";
+        recUnitEl.textContent = "";
+      } else {
+        ingredientNoEl.textContent = pad2(rec.seq);
+        recValueEl.textContent = formatValueByUnit(rec.weightG, rec.unit);
+        recUnitEl.textContent = rec.unit;
+      }
+    } else {
+      ingredientNoEl.textContent = "";
+      recValueEl.textContent = "";
+      recUnitEl.textContent = "";
+    }
+
+    const showUnderline = (state.records.length > 0) && isViewingLatest();
+    latestUnderlineEl.style.opacity = showUnderline ? 1 : 0;
+  }
+
+  function setPower(on){
+    state.on = on;
+    if(on){
+      state.unit = "g";
+      state.rawWeightG = 0;
+      state.tareOffsetG = 0;
+      state.ingreEnabled = true;
+      state.tareStage = 0;
+      state.seqInStage = 0;
+      state.records = [];
+      state.viewIndex = -1;
+    } else {
+      state.records = [];
+      state.viewIndex = -1;
+    }
+    render();
+  }
+
+  function togglePower(){ setPower(!state.on); }
+
+  function cycleUnit(){
+    if(!state.on) return;
+    const idx = UNITS.indexOf(state.unit);
+    state.unit = UNITS[(idx + 1) % UNITS.length];
+    render();
+  }
+
+  function browse(delta){
+    if(!state.on) return;
+    if(state.records.length === 0) return;
+    const next = Math.min(latestIndex(), Math.max(0, state.viewIndex + delta));
+    state.viewIndex = next;
+    render();
+  }
+
+  // 短按 T：儲存重量（ingredient 01...）
+  function saveWeight(){
+    if(!state.on) return;
+    if(!state.ingreEnabled) return;
+    const netG = getNetWeightG();
+    if(netG === 0) return;
+
+    state.seqInStage += 1;
+    state.records.push({
+      type: "weight",
+      stage: state.tareStage,
+      seq: state.seqInStage,
+      weightG: netG,
+      unit: state.unit
+    });
+    state.viewIndex = latestIndex();
+
+    // 儲存後右側歸零（沿用你之前 ADD 行為）
+    state.rawWeightG = 0;
+    state.tareOffsetG = 0;
+
+    render();
+  }
+  function renumberRecords(){
+  // 重新依照 records 的時間順序，把 stage/seq 全部重算
+  let stage = 0;  // 0~5
+  let seq = 0;    // 每個 stage 內從 01 開始
+
+  state.records.forEach((rec) => {
+    if(rec.type === "tare"){
+      if(stage < 5){
+        stage += 1;
+        seq = 0;
+        rec.stage = stage;
+      } else {
+        rec.stage = 5;
+      }
+      return;
+    }
+
+    if(rec.type === "weight"){
+      rec.stage = stage;
+      seq += 1;
+      rec.seq = seq;
+      return;
+    }
+  });
+
+  state.tareStage = stage;
+  state.seqInStage = seq;
+}
+  function deleteCurrentRecord(){
+  if(state.viewIndex < 0 || state.viewIndex >= state.records.length) return;
+
+  const deleteIndex = state.viewIndex;
+  state.records.splice(deleteIndex, 1);
+
+  if(state.records.length === 0){
+    state.viewIndex = -1;
+    // ✅ 刪到沒有資料 ingre-icon 仍恆亮
+    state.ingreEnabled = true;
+    return;
+  }
+
+  // ✅ 若刪到的是 tare(00)，後面 stage 往前縮：直接重算全部
+  renumberRecords();
+
+  // ✅ 刪除後停留：中間筆→原本下一筆；最後筆→新的最後一筆
+  state.viewIndex = Math.min(deleteIndex, state.records.length - 1);
+}
+
+  function deleteAllRecords(){
+   state.records = [];
+   state.viewIndex = -1;
+
+   // ✅ 清空後 ingre-icon 恆亮
+   state.ingreEnabled = true;
+
+   // 同時把序列/階段重置（避免下一筆儲存接錯）
+   state.tareStage = 0;
+   state.seqInStage = 0;
+}
+
+  // 長按 T 1.5s：Tare
+  function doTare(){
+    if(!state.on) return;
+
+    const netG = getNetWeightG();
+    if(netG === 0) return;
+    
+    // ✅ Ingredient list 關閉：Tare 只歸零，不紀錄、不動序列、不換 icon
+    if(!state.ingreEnabled){
+    // 規則：>=20g 才亮 tare-icon00；下一次 tare 若 <20g 則關掉
+     if(netG >= 20){
+       state.tare00On = true;
+     } else {
+       state.tare00On = false;
+    }
+
+    state.tareOffsetG = state.rawWeightG;
+    render();
+    return;
+  }
+
+    // 第1~5次：會進位、會顯示新 icon、會被記錄成 ingredient 00、並重置後續 seq 從 01 開始
+    if(state.tareStage < 5){
+      state.tareStage += 1;
+      state.seqInStage = 0;
+
+      state.records.push({ type: "tare", stage: state.tareStage });
+      state.viewIndex = latestIndex();
+    }
+    // 第6次以後：只歸零，不記錄、不改 icon、不重置 seq
+    // （依你規則：仍可繼續儲存重量）
+
+    // 右側歸零（顯示效果）
+    state.tareOffsetG = state.rawWeightG;
+
+    render();
+  }
+
+  // 輸入重量：視為新秤重（清掉 tareOffset，保留 tareStage icon）
+  weightInput.addEventListener("keydown", (e) => {
+    if(e.key === "Enter"){
+      if(!state.on) return;
+      const v = Number(weightInput.value);
+      if(Number.isFinite(v) && v >= 0){
+        state.rawWeightG = Math.round(v);
+        state.tareOffsetG = 0;
+        render();
+      }
+
+      weightInput.value = "";
+      weightInput.blur();
+    }
+  });
+
+  // Hotspots
+  const hotspotEls = [];
+
+  function makeHotspot(btn){
+    const el = document.createElement("button");
+    el.className = "hotspot";
+    el.setAttribute("aria-label", btn.label);
+    el.style.left   = pct(btn.x, BASE_W) + "%";
+    el.style.top    = pct(btn.y, BASE_H) + "%";
+    el.style.width  = pct(btn.w, BASE_W) + "%";
+    el.style.height = pct(btn.h, BASE_H) + "%";
+
+    let timer = null;
+    let longFired = false;
+
+    const startHold = () => {
+      longFired = false;
+      if(btn.longPressMs && btn.longPressMs > 0){
+        timer = setTimeout(() => {
+          longFired = true;
+          if(btn.id === "unit") togglePower();
+          if(btn.id === "tare") doTare();
+          if(btn.id === "down"){
+           // ✅ 有資料：長按DOWN進入「刪除全部」模式
+          if(state.records.length > 0){
+            state.deleteAllMode = true;
+            state.deleteChoiceYes = true; // default YES→
+            render();
+          } else {
+          
+            state.ingreEnabled = !state.ingreEnabled;
+
+            if(state.ingreEnabled){
+              state.tare00On = false;
+            }
+
+            render();
+            }
+          }
+          if(btn.id === "up"){
+       // 只有在有資料、且目前正在看某筆（01/02/00都算）才可進入
+          if(state.records.length > 0 && state.viewIndex >= 0){
+            state.deleteMode = true;
+            state.deleteChoiceYes = true; // default YES→
+            render();
+           }
+          }
+        }, btn.longPressMs);
+      }
+    };
+ 
+    // ✅ 刪除全部模式：完全鎖住瀏覽行為
+      if(state.deleteAllMode){
+       if(btn.id === "up" || btn.id === "down"){
+       // 只允許 YES / NO 切換
+        state.deleteChoiceYes = !state.deleteChoiceYes;
+        render();
+        return;
+       }
+
+       if(btn.id === "tare"){
+        if(state.deleteChoiceYes){
+          deleteAllRecords();
+        }
+        state.deleteAllMode = false;
+        render();
+        return;
+       }
+
+      // 其他按鍵（包含 unit）在刪除全部模式下一律不做事
+       return;
+     }
+  
+  
+    const endHold = () => { if(timer) clearTimeout(timer); };
+
+    el.addEventListener("mousedown", startHold);
+    window.addEventListener("mouseup", endHold);
+
+    el.addEventListener("click", () => {
+      if(longFired) return;
+
+      if(state.deleteAllMode){
+       switch(btn.id){
+        case "up":
+        case "down":
+         state.deleteChoiceYes = !state.deleteChoiceYes;
+         render();
+         return;
+
+        case "tare":
+         if(state.deleteChoiceYes){
+           deleteAllRecords();
+         }
+         state.deleteAllMode = false;
+         render();
+         return;
+
+        case "unit":
+         cycleUnit();
+         return;
+      }
+      // ✅ 小保護：其他按鍵不做事，避免掉到下面正常流程
+      return;
+    }
+
+
+      // ✅ 刪除模式：短按UP/DOWN切換 YES/NO；短按TARE確認
+      if(state.deleteMode){
+       switch(btn.id){
+         case "up":
+         case "down":
+           state.deleteChoiceYes = !state.deleteChoiceYes;
+           render();
+           return;
+
+         case "tare":
+          if(state.deleteChoiceYes){
+            deleteCurrentRecord();
+          }
+         // YES 或 NO 都離開刪除模式
+          state.deleteMode = false;
+          render();
+          return;
+
+         case "unit":
+         // 刪除模式下仍允許切單位（或你要禁用也可）
+          cycleUnit();
+          return;
+       }
+
+       return;
+     }
+      switch(btn.id){
+        case "up":   browse(-1); break;
+        case "down": browse(+1); break;
+        case "tare": saveWeight(); break; // ✅ 短按 T = 儲存重量
+        case "unit": cycleUnit(); break;
+      }
+    });
+
+    return el;
+  }
+
+  BUTTONS.forEach(b => {
+    const el = makeHotspot(b);
+    device.appendChild(el);
+    hotspotEls.push(el);
+  });
+
+  toggleAllOnBtn.addEventListener("click", () => {
+  state.allOnPreview = !state.allOnPreview;
+  toggleAllOnBtn.textContent = state.allOnPreview ? "OFF" : "Check";
+  render();
+});
+
+  toggleHotspotsBtn.addEventListener("click", () => {
+    state.lang = (state.lang === "en") ? "zh" : "en";
+    applyLanguage();
+    state.hotspotsVisible = !state.hotspotsVisible;
+    hotspotEls.forEach(el => el.classList.toggle("show", state.hotspotsVisible));
+  });
+  toggleLangBtn.addEventListener("click", () => {
+  state.lang = (state.lang === "en") ? "zh" : "en";
+  applyLanguage();
+});
+
+// 初始化先套用一次
+applyLanguage();
+  
+  setPower(true);
+})();
+</script>
+</body>
+</html>
