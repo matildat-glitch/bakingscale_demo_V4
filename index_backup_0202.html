@@ -155,7 +155,8 @@
 #lcd_background{
   position: absolute;
   inset: 0;
-  opacity: .5; /* ✅ 先顯示，方便確認；要隱藏再改成 0 */
+  opacity: .35;
+  display: block;
   pointer-events: none;
   z-index: 1;
 }
@@ -381,27 +382,29 @@
   transform: translate(-50%, -50%);
   opacity: 0;
   z-index: 5;
+  aspect-ratio: var(--ar, 1 / 1);
 }
 
 .lcdIcon.on{ opacity: 1 !important; }
 
 .lcdIcon > svg{
   width: 100%;
-  height: auto;
+  height: 100%;
   display: block;
 }
 /* Right Side */
 #live_unit_g{
   --x: 86.5%;    /* 左右 */
   --y: 89%;    /* 上下 */
-  --w: 1.8%;     /* 寬度（改這個就是改大小） */
+  --w: 2.5%;     /* 寬度（改這個就是改大小） */
 }
 
 
 #live_unit_lb{
   --x: 62%;    /* 左右：先放在 g 的左邊一點點，之後你再微調 */
   --y: 87%;      /* 上下：先跟 g 對齊 */
-  --w: 2.5%;     /* 寬度：lb 比 g 寬一點 */
+  --w: 2.5%;     /* 寬度：加大方便對位 */
+  --ar: 5.34 / 5.53;
 }
 
 
@@ -426,7 +429,7 @@
 #live_colon{
   --x: 66.4%;
   --y: 45.8%;
-  --w: 1.4%;
+  --w: 7%;
 }
 
 #live_dot01{
@@ -463,7 +466,7 @@
 #icon_reset{
   --x: 45.2%;
   --y: 25.6%;
-  --w: 3%;
+  --w: 3.5%;
 }
 
 #icon_reset_arrow{
@@ -513,7 +516,7 @@
 #rec_unit_g{
   --x: 36%;  
   --y: 89%;   
-  --w: 1.8%;   
+  --w: 2.5%;   
 }
 
 #rec_unit_lb{
@@ -543,7 +546,7 @@
 #rec_colon{
   --x: 19.5%;  
   --y: 57.5%;   
-  --w: 1%;   
+  --w: 5%;   
 }
 
 #rec_dot01{
@@ -693,7 +696,6 @@
     body.lcdAllOn .lcdIcon{ opacity: 1 !important; }
     body.lcdAllOn #live_yes,
     body.lcdAllOn #live_no{ display: flex; }
-    body.lcdAllOn #lcd_background{ opacity: .35; }
     .allOnDigits{ display: none; }
     body.lcdAllOn .allOnDigits{ display: flex; }
 
@@ -1515,7 +1517,473 @@
               <div id="lcd_background"></div>
             </div>
             <div class="lcdSeg" id="lcdSeg"></div>
-            <div class="lcdIcons" id="lcdIcons"></div>
+            <div class="lcdIcons" id="lcdIcons">
+              <div class="lcdIcon" id="live_unit_lb">
+                <svg viewBox="0 0 5.34 5.53">
+                  <defs>
+                    <style>
+                      .live-unit-lb-fill {
+                        fill: #fefefe;
+                      }
+                    </style>
+                  </defs>
+                  <g>
+                    <g>
+                      <path class="live-unit-lb-fill" d="M1.03,5.46H0V0h1.03v5.46Z"/>
+                      <path class="live-unit-lb-fill" d="M5.34,3.57c0,.62-.13,1.1-.39,1.44-.26.34-.63.52-1.1.52-.42,0-.75-.16-1-.48l-.05.41h-.92V0h1.03v1.96c.24-.28.55-.41.93-.41.47,0,.84.17,1.1.52s.4.83.4,1.45v.06ZM4.31,3.5c0-.39-.06-.67-.18-.85-.12-.18-.31-.27-.55-.27-.33,0-.55.13-.68.4v1.52c.13.27.35.41.68.41s.55-.16.65-.49c.05-.16.07-.39.07-.71Z"/>
+                    </g>
+                  </g>
+                </svg>
+              </div>
+
+              <div class="lcdIcon" id="live_unit_fl">
+                <svg viewBox="0 0 6.04 5.57">
+                 <defs>
+                   <style>
+                     .live-unit-fl-fill {
+                       fill: #fefefe;
+                     }
+                   </style>
+                 </defs>
+                 <g>
+                   <g>
+                     <path class="live-unit-fl-fill" d="M.57,5.53v-3.09h-.57v-.75h.57v-.33c0-.43.12-.77.37-1,.25-.24.59-.36,1.04-.36.14,0,.32.02.52.07v.8c-.1-.02-.2-.03-.32-.03-.39,0-.58.18-.58.54v.31h.76v.75h-.76v3.09H.57Z"/>
+                     <path class="live-unit-fl-fill" d="M3.98,5.53h-1.03V.07h1.03v5.46Z"/>
+                     <path class="live-unit-fl-fill" d="M4.88,5.03c0-.16.06-.3.16-.4.11-.1.25-.15.41-.15s.31.05.42.15c.11.1.17.24.17.4s-.05.29-.16.39-.25.15-.42.15-.31-.05-.42-.15-.16-.23-.16-.39Z"/>
+                   </g>
+                 </g>
+               </svg>
+              </div>
+
+              <div class="lcdIcon" id="live_unit_oz">
+                <svg viewBox="0 0 7.28 3.99">
+                 <defs>
+                   <style>
+                     .live-unit-oz-fill {
+                       fill: #fefefe;
+                     }
+                   </style>
+                 </defs>
+                 <g>
+                   <g>
+                     <path class="live-unit-oz-fill" d="M0,1.96c0-.38.07-.72.22-1.02.15-.3.36-.53.63-.69.28-.16.6-.25.96-.25.52,0,.94.16,1.27.48s.51.75.55,1.29v.26c0,.59-.16,1.06-.49,1.42-.33.36-.77.53-1.32.53s-1-.18-1.33-.53c-.33-.36-.5-.84-.5-1.45v-.05ZM1.03,2.03c0,.37.07.65.21.84.14.19.33.29.59.29s.44-.1.58-.29c.14-.19.21-.5.21-.92,0-.36-.07-.64-.21-.83-.14-.2-.34-.29-.59-.29s-.45.1-.58.29c-.14.2-.21.5-.21.91Z"/>
+                     <path class="live-unit-oz-fill" d="M5.4,3.09h1.88v.83h-3.19v-.63l1.81-2.39h-1.75V.07h3.08v.61l-1.82,2.41Z"/>
+                   </g>
+                 </g>
+               </svg>
+              </div>
+
+              <div class="lcdIcon" id="live_unit_g">
+               <svg viewBox="0 0 3.51 5.43">
+                 <defs>
+                   <style>
+                     .live-unit-g-fill {
+                       fill: #fefefe;
+                     }
+                   </style>
+                 </defs>
+                 <g>
+                   <path class="live-unit-g-fill" d="M0,1.96C0,1.37.14.9.42.54s.66-.54,1.13-.54c.42,0,.75.14.98.43l.04-.36h.93v3.72c0,.34-.08.63-.23.88-.15.25-.37.44-.64.57-.28.13-.6.2-.97.2-.28,0-.56-.06-.82-.17s-.47-.26-.61-.44l.45-.62c.26.29.57.43.93.43.27,0,.48-.07.64-.22.15-.15.23-.35.23-.62v-.21c-.24.27-.55.4-.93.4-.46,0-.84-.18-1.12-.54s-.43-.84-.43-1.44v-.04ZM1.03,2.04c0,.35.07.62.21.82s.33.3.58.3c.31,0,.54-.12.67-.35v-1.62c-.14-.24-.36-.35-.66-.35-.25,0-.44.1-.58.3-.14.2-.21.5-.21.9Z"/>
+                 </g>
+               </svg> 
+              </div>
+
+              <div class="lcdIcon" id="live_unit_ml">
+                <svg viewBox="0 0 7.38 5.46">
+                 <defs>
+                   <style>
+                     .live-unit-ml-fill {
+                       fill: #fefefe;
+                     }
+                   </style>
+                 </defs>
+                 <g>
+                   <g>
+                     <path class="live-unit-ml-fill" d="M.96,1.61l.03.43c.27-.33.64-.5,1.1-.5.49,0,.83.2,1.02.59.27-.39.65-.59,1.15-.59.42,0,.73.12.93.36.2.24.31.61.31,1.1v2.46h-1.03v-2.45c0-.22-.04-.38-.13-.48-.09-.1-.24-.15-.45-.15-.31,0-.52.15-.64.44v2.64s-1.02,0-1.02,0v-2.45c0-.22-.04-.38-.13-.48-.09-.1-.24-.15-.45-.15-.29,0-.5.12-.63.36v2.72H0V1.61h.96Z"/>
+                     <path class="live-unit-ml-fill" d="M7.38,5.46h-1.03V0h1.03v5.46Z"/>
+                   </g>
+                 </g>
+               </svg>
+              </div>
+
+              <div class="lcdIcon" id="live_colon">
+                <svg viewBox="0 0 2.87 14.31">
+                 <defs>
+                   <style>
+                     .live-colon-fill {
+                       fill: #fff;
+                     }
+                   </style>
+                 </defs>
+                 <g>
+                   <g>
+                     <circle class="live-colon-fill" cx="1.43" cy="12.87" r="1.43"/>
+                     <circle class="live-colon-fill" cx="1.43" cy="1.43" r="1.43"/>
+                   </g>
+                 </g>
+               </svg>
+              </div>
+
+              <div class="lcdIcon" id="live_dot01">
+                <svg viewBox="0 0 2.87 2.87">
+                 <defs>
+                   <style>
+                     .live-dot01-fill {
+                       fill: #fff;
+                     }
+                   </style>
+                 </defs>
+                 <g>
+                   <circle class="live-dot01-fill" cx="1.43" cy="1.43" r="1.43"/>
+                 </g>
+               </svg>
+              </div>
+
+              <div class="lcdIcon" id="live_dot02">
+                <svg viewBox="0 0 2.87 2.87">
+                 <defs>
+                   <style>
+                     .live-dot02-fill {
+                       fill: #fff;
+                     }
+                   </style>
+                 </defs>
+                 <g>
+                   <circle class="live-dot02-fill" cx="1.43" cy="1.43" r="1.43"/>
+                 </g>
+               </svg>
+              </div>
+
+              <div class="lcdIcon" id="icon_tare00">
+                <svg viewBox="0 0 7.24 6.43">
+                 <defs>
+                   <style>
+                     .icon-tare00-fill {
+                       fill: #fff;
+                     }
+                   </style>
+                 </defs>
+                 <g>
+                   <g>
+                     <path class="icon-tare00-fill" d="M7.19,0c-.03,4.49-1.63,4.26-3.58,4.26S.11,4.49.09,0h7.1Z"/>
+                     <path class="icon-tare00-fill" d="M6.92,6.43H.32c-.18,0-.32-.14-.32-.32s.14-.32.32-.32h6.61c.18,0,.32.14.32.32s-.14.32-.32.32"/>
+                   </g>
+                 </g>
+               </svg>
+              </div>
+
+              <div class="lcdIcon" id="rec_unit_lb">
+                <svg viewBox="0 0 5.34 5.53">
+                 <defs>
+                   <style>
+                     .rec-uniy-lb-fill {
+                       fill: #34e6bf;
+                     }
+                   </style>
+                 </defs>
+                 <g>
+                   <g>
+                     <path class="rec-uniy-lb-fill" d="M1.03,5.46H0V0h1.03v5.46Z"/>
+                     <path class="rec-uniy-lb-fill" d="M5.34,3.57c0,.62-.13,1.1-.39,1.44s-.63.52-1.1.52c-.42,0-.75-.16-1-.48l-.05.41h-.92V0h1.03v1.96c.24-.28.55-.42.93-.42.47,0,.84.17,1.1.52.27.34.4.83.4,1.46v.06ZM4.31,3.5c0-.39-.06-.67-.18-.85-.12-.18-.31-.27-.55-.27-.33,0-.55.13-.67.4v1.52c.13.27.35.41.68.41s.55-.16.65-.49c.05-.16.07-.39.07-.71Z"/>
+                   </g>
+                 </g>
+               </svg>
+              </div>
+
+              <div class="lcdIcon" id="rec_unit_fl">
+                <svg viewBox="0 0 6.04 5.57">
+                 <defs>
+                   <style>
+                     .rec-unit-fl-fill {
+                       fill: #34e6bf;
+                     }
+                   </style>
+                 </defs>
+                 <g>
+                   <g>
+                     <path class="rec-unit-fl-fill" d="M.57,5.53v-3.09h-.57v-.75h.57v-.33c0-.43.12-.77.37-1,.25-.24.59-.36,1.04-.36.14,0,.32.02.52.07v.79c-.1-.02-.2-.03-.32-.03-.39,0-.58.18-.58.54v.31h.76v.75h-.76v3.09H.57Z"/>
+                     <path class="rec-unit-fl-fill" d="M3.98,5.53h-1.03V.07h1.03v5.46Z"/>
+                     <path class="rec-unit-fl-fill" d="M4.88,5.03c0-.16.06-.3.17-.4.11-.1.25-.15.41-.15s.31.05.42.15.17.23.17.4-.05.29-.16.39c-.11.1-.25.15-.42.15s-.31-.05-.42-.15c-.11-.1-.16-.23-.16-.39Z"/>
+                   </g>
+                 </g>
+               </svg>
+              </div>
+
+              <div class="lcdIcon" id="rec_unit_oz">
+                <svg viewBox="0 0 7.28 3.99">
+                 <defs>
+                   <style>
+                     .rec-unit-oz-fill {
+                       fill: #34e6bf;
+                     }
+                   </style>
+                 </defs>
+                 <g>
+                   <g>
+                     <path class="rec-unit-oz-fill" d="M0,1.96c0-.38.07-.72.22-1.02.15-.3.36-.53.63-.69.28-.16.6-.25.96-.25.52,0,.94.16,1.27.48.33.32.51.75.55,1.29v.26c0,.59-.16,1.06-.49,1.42s-.77.54-1.33.54-1-.18-1.33-.53c-.33-.36-.5-.84-.5-1.45v-.05ZM1.03,2.03c0,.37.07.64.21.84.14.19.33.29.59.29s.44-.1.58-.29c.14-.19.21-.5.21-.92,0-.36-.07-.63-.21-.83s-.34-.29-.59-.29-.45.1-.58.29c-.14.2-.21.5-.21.91Z"/>
+                     <path class="rec-unit-oz-fill" d="M5.4,3.09h1.88v.83h-3.19v-.62l1.81-2.39h-1.75V.07h3.08v.6l-1.82,2.41Z"/>
+                   </g>
+                 </g>
+               </svg>
+              </div>
+
+              <div class="lcdIcon" id="rec_unit_g">
+                <svg viewBox="0 0 3.51 5.43">
+                 <defs>
+                   <style>
+                     .rec-unit-g-fill {
+                       fill: #34e6bf;
+                     }
+                   </style>
+                 </defs>
+                 <g>
+                   <path class="rec-unit-g-fill" d="M0,1.96C0,1.38.14.9.42.54s.66-.54,1.13-.54c.42,0,.75.14.98.43l.04-.36h.93v3.72c0,.34-.08.63-.23.88-.15.25-.37.44-.64.57-.28.13-.6.2-.97.2-.28,0-.56-.06-.82-.17-.27-.11-.47-.26-.61-.44l.46-.62c.26.29.57.43.93.43.27,0,.48-.07.64-.22s.23-.35.23-.62v-.21c-.24.27-.55.4-.93.4-.46,0-.83-.18-1.12-.54-.29-.36-.43-.84-.43-1.44v-.04ZM1.03,2.04c0,.35.07.62.21.82s.33.3.58.3c.31,0,.54-.12.67-.35v-1.62c-.14-.24-.36-.35-.66-.35-.25,0-.44.1-.58.3-.14.2-.21.5-.21.9Z"/>
+                 </g>
+               </svg>
+              </div>
+
+              <div class="lcdIcon" id="rec_unit_ml">
+                <svg viewBox="0 0 7.38 5.46">
+                 <defs>
+                   <style>
+                     .rec-unit-ml-fill {
+                       fill: #34e6bf;
+                     }
+                   </style>
+                 </defs>
+                 <g>
+                   <g>
+                     <path class="rec-unit-ml-fill" d="M.96,1.61l.03.43c.27-.33.64-.5,1.11-.5.5,0,.83.2,1.02.59.27-.39.65-.59,1.15-.59.42,0,.73.12.93.36.2.24.31.61.31,1.1v2.46h-1.03v-2.45c0-.22-.04-.38-.13-.48-.08-.1-.24-.15-.45-.15-.31,0-.52.15-.64.44v2.64s-1.02,0-1.02,0v-2.45c0-.22-.04-.38-.13-.48-.09-.1-.24-.15-.45-.15-.29,0-.5.12-.63.36v2.72H0V1.61h.96Z"/>
+                     <path class="rec-unit-ml-fill" d="M7.38,5.46h-1.03V0h1.03v5.46Z"/>
+                   </g>
+                 </g>
+               </svg>
+              </div>
+
+              <div class="lcdIcon" id="rec_colon">
+                <svg viewBox="0 0 2.15 10.73">
+                 <defs>
+                   <style>
+                     .rec-colon-fill {
+                       fill: #34e6bf;
+                     }
+                   </style>
+                 </defs>
+                 <g>
+                   <g>
+                     <circle class="rec-colon-fill" cx="1.08" cy="9.66" r="1.08"/>
+                     <circle class="rec-colon-fill" cx="1.08" cy="1.08" r="1.08"/>
+                   </g>
+                 </g>
+               </svg>
+              </div>
+
+              <div class="lcdIcon" id="rec_dot01">
+                <svg viewBox="0 0 2.15 2.15">
+                 <defs>
+                   <style>
+                     .rec-dot01-fill {
+                       fill: #34e6bf;
+                     }
+                   </style>
+                 </defs>
+                 <g>
+                   <circle class="rec-dot01-fill" cx="1.08" cy="1.08" r="1.08"/>
+                 </g>
+               </svg>
+              </div>
+              <div class="lcdIcon" id="rec_dot02">
+                  <svg viewBox="0 0 2.15 2.15">
+                 <defs>
+                   <style>
+                     .rec-dot02-fill {
+                       fill: #34e6bf;
+                     }
+                   </style>
+                 </defs>
+                 <g>
+                   <circle class="rec-dot02-fill" cx="1.08" cy="1.08" r="1.08"/>
+                 </g>
+               </svg>
+              </div>
+              <div class="lcdIcon" id="rec_line">
+                <svg viewBox="0 0 14.17 1.64">
+                 <defs>
+                   <style>
+                     .rec-line-fill {
+                       fill: #34e6bf;
+                     }
+                   </style>
+                 </defs>
+                 <g>
+                   <rect class="rec-line-fill" width="14.17" height="1.64"/>
+                 </g>
+               </svg>
+              </div>
+              <div class="lcdIcon" id="icon_ingre">
+                <svg viewBox="0 0 57.7 6.95">
+                 <defs>
+                   <style>
+                     .icon-ingre-fill {
+                       fill: #34e6bf;
+                     }
+                   </style>
+                 </defs>
+                 <g>
+                   <g>
+                     <path class="icon-ingre-fill" d="M0,6.78V.17h1.38v6.61H0Z"/>
+                     <path class="icon-ingre-fill" d="M2.99,6.78V.17h1.15l3.04,4.12h.08V.17h1.32v6.61h-1.15l-3.05-4.14h-.08v4.14h-1.32Z"/>
+                     <path class="icon-ingre-fill" d="M15.8,5.28c-.14.35-.33.66-.58.9-.25.25-.56.44-.92.57-.36.13-.77.2-1.22.2-.49,0-.93-.08-1.32-.24-.39-.16-.72-.39-1-.69-.27-.3-.48-.66-.63-1.09s-.22-.92-.22-1.46.07-1.01.22-1.44.36-.79.63-1.09c.27-.3.6-.53.99-.69.39-.16.82-.24,1.3-.24.39,0,.75.05,1.09.16.33.11.63.26.88.46.25.2.46.44.62.72.16.28.27.59.32.93h-1.37c-.1-.34-.29-.6-.55-.78-.26-.18-.59-.28-.98-.28-.27,0-.51.05-.72.15-.21.1-.39.25-.54.44s-.26.43-.34.7-.12.59-.12.94.04.67.12.95c.08.28.2.52.36.72.15.2.34.35.56.45.22.1.47.16.74.16.23,0,.43-.03.62-.1.19-.06.35-.15.49-.27.14-.12.24-.26.32-.42.08-.16.12-.35.13-.55v-.12s-1.43,0-1.43,0v-1.04h2.78v.84c0,.44-.07.84-.2,1.2Z"/>
+                     <path class="icon-ingre-fill" d="M18.71,6.78h-1.38V.17h2.78c.36,0,.69.05.98.15.29.1.54.24.74.42.2.18.36.41.47.67.11.26.16.56.16.89,0,.21-.03.41-.08.61s-.13.37-.23.54c-.1.16-.23.31-.38.43-.15.13-.32.23-.51.3l1.39,2.61h-1.57l-1.23-2.4h-1.13v2.4ZM18.71,3.32h1.21c.35,0,.62-.09.82-.27.19-.18.29-.43.29-.75,0-.16-.03-.3-.08-.42-.05-.13-.13-.23-.22-.32s-.21-.16-.35-.2c-.14-.05-.29-.07-.47-.07h-1.2v2.03Z"/>
+                     <path class="icon-ingre-fill" d="M28.22,6.78h-4.38V.17h4.38v1.18h-3v1.54h2.83v1.09h-2.83v1.61h3v1.18Z"/>
+                     <path class="icon-ingre-fill" d="M32.28.16c.49,0,.93.07,1.31.22s.71.36.97.64.47.62.61,1.03.21.87.21,1.38-.07,1.01-.21,1.43c-.14.42-.34.77-.6,1.05-.26.28-.59.5-.97.65s-.82.22-1.32.22h-2.6V.16h2.6ZM31.06,5.6h1c.61,0,1.09-.18,1.42-.55.33-.36.49-.9.49-1.6,0-.33-.04-.63-.13-.89s-.21-.48-.38-.66c-.16-.18-.36-.32-.6-.41s-.5-.14-.8-.14h-1v4.25Z"/>
+                     <path class="icon-ingre-fill" d="M36.69,6.78V.17h1.38v6.61h-1.38Z"/>
+                     <path class="icon-ingre-fill" d="M44.06,6.78h-4.38V.17h4.38v1.18h-3v1.54h2.83v1.09h-2.83v1.61h3v1.18Z"/>
+                     <path class="icon-ingre-fill" d="M45.52,6.78V.17h1.15l3.04,4.12h.08V.17h1.32v6.61h-1.15l-3.05-4.14h-.08v4.14h-1.32Z"/>
+                     <path class="icon-ingre-fill" d="M54.33,6.78V1.35h-1.98V.17h5.35v1.18h-1.98v5.43h-1.38Z"/>
+                   </g>
+                 </g>
+               </svg>
+              </div>
+              <div class="lcdIcon" id="icon_tare01">
+                <svg viewBox="0 0 9.27 6.48">
+                 <defs>
+                   <style>
+                     .icon-tare01-fill {
+                       fill: #fefefe;
+                     }
+                   </style>
+                 </defs>
+                 <g>
+                   <path class="icon-tare01-fill" d="M0,0c.03,5.87,2.06,6.48,4.6,6.48s4.64-.61,4.67-6.48H0ZM5.23,4.91h-.83v-2.63l-.81.24v-.62l1.56-.54h.08v3.55Z"/>
+                 </g>
+               </svg>
+              </div>
+              <div class="lcdIcon" id="icon_tare02">
+                <svg viewBox="0 0 9.27 6.48">
+                 <defs>
+                   <style>
+                     .icon-tare02-fill {
+                       fill: #fefefe;
+                     }
+                   </style>
+                 </defs>
+                 <g>
+                   <path class="icon-tare02-fill" d="M0,0c.03,5.87,2.06,6.48,4.6,6.48s4.64-.61,4.67-6.48H0ZM5.89,4.91h-2.48v-.54l1.14-1.2c.28-.32.42-.58.42-.76,0-.15-.03-.27-.1-.35-.07-.08-.16-.12-.29-.12s-.23.05-.31.16-.12.24-.12.4h-.82c0-.22.05-.42.16-.6s.26-.33.45-.43c.19-.1.41-.16.65-.16.38,0,.68.09.89.27.21.18.31.43.31.76,0,.14-.03.28-.08.41-.05.13-.13.27-.24.42-.11.15-.29.34-.53.58l-.46.53h1.4v.63Z"/>
+                 </g>
+               </svg>
+              </div>
+              <div class="lcdIcon" id="icon_tare03">
+                <svg viewBox="0 0 9.27 6.48">
+                 <defs>
+                   <style>
+                     .icon-tare03-fill {
+                       fill: #fefefe;
+                     }
+                   </style>
+                 </defs>
+                 <g>
+                   <path class="icon-tare03-fill" d="M0,0c.03,5.87,2.06,6.48,4.6,6.48s4.64-.61,4.67-6.48H0ZM5.52,4.67c-.24.19-.57.29-.96.29-.23,0-.45-.04-.65-.13s-.35-.21-.45-.37-.15-.34-.15-.54h.83c0,.11.04.2.13.28.09.08.2.12.32.12.15,0,.26-.04.35-.12.09-.08.13-.18.13-.31,0-.18-.04-.31-.13-.38-.09-.08-.21-.11-.37-.11h-.4v-.61h.39c.31,0,.46-.15.46-.45,0-.12-.04-.21-.11-.29s-.18-.11-.31-.11c-.11,0-.2.03-.28.09-.08.06-.12.14-.12.24h-.82c0-.19.05-.35.16-.5s.25-.26.43-.34.39-.12.61-.12c.4,0,.71.09.93.27.23.18.34.43.34.75,0,.15-.05.3-.14.43s-.23.25-.41.33c.19.07.34.17.45.31.11.14.16.31.16.52,0,.32-.12.57-.37.76Z"/>
+                 </g>
+               </svg>
+              </div>
+              <div class="lcdIcon" id="icon_tare04">
+                <svg viewBox="0 0 9.27 6.48">
+                 <defs>
+                   <style>
+                     .icon-tare04-fill {
+                       fill: #fefefe;
+                     }
+                   </style>
+                 </defs>
+                 <g>
+                   <g>
+                     <path class="icon-tare04-fill" d="M0,0c.03,5.87,2.06,6.48,4.6,6.48s4.64-.61,4.67-6.48H0ZM5.77,4.15h-.36v.75h-.82v-.75h-1.37l-.05-.5,1.42-2.29h0s.82,0,.82,0v2.17h.36v.63Z"/>
+                     <polygon class="icon-tare04-fill" points="3.95 3.52 4.59 3.52 4.59 2.42 4.54 2.51 3.95 3.52"/>
+                   </g>
+                 </g>
+               </svg>
+              </div>
+              <div class="lcdIcon" id="icon_tare05">
+                <svg viewBox="0 0 9.27 6.48">
+                 <defs>
+                   <style>
+                     .icon-tare05-fill {
+                       fill: #fefefe;
+                     }
+                   </style>
+                 </defs>
+                 <g>
+                   <path class="icon-tare05-fill" d="M0,0c.03,5.87,2.06,6.48,4.6,6.48s4.64-.61,4.67-6.48H0ZM5.72,4.38c-.1.18-.25.33-.43.43-.18.1-.4.15-.65.15-.22,0-.43-.05-.63-.14s-.35-.22-.46-.38-.17-.34-.16-.54h.83c0,.13.05.23.12.31s.17.11.3.11c.28,0,.41-.21.41-.61,0-.38-.17-.57-.51-.57-.19,0-.33.06-.43.19l-.65-.15.22-1.82h2.08v.64h-1.41l-.08.71c.06-.03.13-.06.23-.09.09-.03.19-.04.28-.04.35,0,.62.1.81.31s.28.5.28.88c0,.23-.05.43-.15.62Z"/>
+                 </g>
+               </svg>
+              </div>
+              <div class="lcdIcon" id="icon_reset">
+                <svg viewBox="0 0 6.08 7.28">
+                 <defs>
+                   <style>
+                     .icon-reset-fill {
+                       fill: #fff;
+                     }
+                   </style>
+                 </defs>
+                 <g>
+                   <g>
+                     <polygon class="icon-reset-fill" points="3.8 .53 3.8 0 2.24 0 2.24 .53 0 .53 0 1.27 6.08 1.27 6.08 .53 3.8 .53"/>
+                     <path class="icon-reset-fill" d="M0,1.91v4.34c0,.57.46,1.03,1.03,1.03h4.01c.57,0,1.03-.46,1.03-1.03V1.91H0ZM2.45,6.02h-.74v-2.85h.74v2.85ZM4.36,6.02h-.74v-2.85h.74v2.85Z"/>
+                   </g>
+                 </g>
+               </svg>
+              </div>
+              <div class="lcdIcon" id="icon_reset_arrow">
+                <svg viewBox="0 0 5.51 4.64">
+                 <defs>
+                   <style>
+                     .icon-reset-arrow-fill {
+                       fill: #fff;
+                     }
+                   </style>
+                 </defs>
+                 <g>
+                   <path class="icon-reset-arrow-fill" d="M5.23,2s-1.75-2-1.75-2l-.75.66s.54.61,1.02,1.16H0v1h3.75s-1.02,1.16-1.02,1.16l.75.66,2.03-2.31-.28-.33Z"/>
+                 </g>
+               </svg>
+              </div>
+              <div class="lcdIcon" id="icon_charging">
+                <svg viewBox="0 0 4.18 5.48">
+                 <defs>
+                   <style>
+                     .icon-charging-fill {
+                       fill: #fff;
+                     }
+                   </style>
+                 </defs>
+                 <g>
+                   <path class="icon-charging-fill" d="M4.09,2.3h-1.89L2.74.1c.02-.08-.09-.14-.14-.07L.02,3.05c-.05.05,0,.14.06.14h1.89l-.53,2.19c-.02.08.09.14.14.07l2.57-3.02c.05-.05,0-.14-.06-.14Z"/>
+                 </g>
+               </svg>
+              </div>
+              <div class="lcdIcon" id="icon_battery">
+                <svg viewBox="0 0 9.54 5.48">
+                  <defs>
+                    <style>
+                      .icon-battery-fill {
+                        fill: #fff;
+                      }
+                    </style>
+                  </defs>
+                  <g>
+                    <g>
+                      <rect class="icon-battery-fill" y="1.71" width="1.61" height="2.06"/>
+                      <rect class="icon-battery-fill" x="2.45" y="1.71" width="1.61" height="2.06"/>
+                      <rect class="icon-battery-fill" x="4.89" y="1.71" width="1.61" height="2.06"/>
+                      <path class="icon-battery-fill" d="M9.26,1h-.93V.28c0-.16-.13-.28-.28-.28H.28C.13,0,0,.13,0,.28v.72h7.33v3.48H0v.72C0,5.35.13,5.48.28,5.48h7.77c.16,0,.28-.13.28-.28v-.72h.93c.16,0,.28-.13.28-.28V1.28c0-.16-.13-.28-.28-.28Z"/>
+                    </g>
+                  </g>
+                </svg>
+              </div>
+              
+            </div>
             <div class="hotspots" id="hotspots"></div>
 
             </div> <!-- /deviceInner -->
