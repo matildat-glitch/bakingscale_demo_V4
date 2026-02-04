@@ -248,7 +248,8 @@
 
 
 /* --- default positions (adjust like icons via CSS vars) --- */
-#rec_list{
+#rec_list,
+#rec_list_allon{
   --x: 31.5%;
   --y: 18%;
   --w: 22%;
@@ -258,7 +259,8 @@
   color: #34e6bf;
 }
 
-#rec_weight{
+#rec_weight,
+#rec_weight_allon{
   --x: 15.5%;
   --y: 56.5%;
   --w: 55%;
@@ -270,7 +272,8 @@
 
 
 
-#live_weight{
+      #live_weight,
+      #live_weight_allon{
   --x: 65.5%;
   --y: 45.5%;
   --w: 60%;
@@ -281,38 +284,44 @@
   color: #fff;
 }
 
-#live_weight .segDigit{
+#live_weight .segDigit,
+#live_weight_allon .segDigit{
   width: auto;                 /* 不再強制平均寬度 */
   aspect-ratio: 16.73 / 47.8;  /* 符合 live_weight digit 的 viewBox */
   flex: 0 0 auto;              /* 不被 flex 撐寬 */
 }
 
 /* 確保 SVG 撐滿 digit 本體 */
-#live_weight .segDigit svg{
+#live_weight .segDigit svg,
+#live_weight_allon .segDigit svg{
   width: 100%;
   height: 100%;
 }
 
-#rec_weight .segDigit{
+#rec_weight .segDigit,
+#rec_weight_allon .segDigit{
   width: auto;                 /* 不再強制平均寬度 */
   aspect-ratio: 16.73 / 47.8;  /* 符合 live_weight digit 的 viewBox */
   flex: 0 0 auto;              /* 不被 flex 撐寬 */
 }
 
 /* 確保 SVG 撐滿 digit 本體 */
-#rec_weight .segDigit svg{
+#rec_weight .segDigit svg,
+#rec_weight_allon .segDigit svg{
   width: 100%;
   height: 100%; 
 }
 
-#rec_list .segDigit{
+#rec_list .segDigit,
+#rec_list_allon .segDigit{
   width: auto;                
   aspect-ratio: 6.37 / 14.79; 
   flex: 0 0 auto;              
 }
 
 /* 確保 SVG 撐滿 digit 本體 */
-#rec_list .segDigit svg{
+#rec_list .segDigit svg,
+#rec_list_allon .segDigit svg{
   width: 100%;
   height: 100%; 
 }
@@ -386,6 +395,7 @@
 }
 
 .lcdIcon.on{ opacity: 1 !important; }
+.lcdIcon.on{ visibility: visible; }
 
 .lcdIcon > svg{
   width: 100%;
@@ -698,6 +708,7 @@
     body.lcdAllOn #live_no{ display: flex; }
     .allOnDigits{ display: none; }
     body.lcdAllOn .allOnDigits{ display: flex; }
+    body.lcdAllOn #live_weight{ display: none; }
 
     @media (max-width: 980px){
       .main{ grid-template-columns: 1fr; }
@@ -1250,7 +1261,16 @@
       </div>
 
       <!-- All-on digits (text-based fallback) -->
-      <div class="segGroup allOnDigits" id="live_weight">
+      <!-- Live weight (5 digits, controlled by JS) -->
+      <div class="segGroup" id="live_weight">
+        <div class="segDigit" data-pos="1"><svg viewBox="0 0 16.73 47.8"><use href="#live_weight_0"></use></svg></div>
+        <div class="segDigit" data-pos="2"><svg viewBox="0 0 16.73 47.8"><use href="#live_weight_0"></use></svg></div>
+        <div class="segDigit" data-pos="3"><svg viewBox="0 0 16.73 47.8"><use href="#live_weight_0"></use></svg></div>
+        <div class="segDigit" data-pos="4"><svg viewBox="0 0 16.73 47.8"><use href="#live_weight_0"></use></svg></div>
+        <div class="segDigit" data-pos="5"><svg viewBox="0 0 16.73 47.8"><use href="#live_weight_0"></use></svg></div>
+      </div>
+
+      <div class="segGroup allOnDigits" id="live_weight_allon">
         <div class="segDigit"><svg viewBox="0 0 16.73 47.8"><use href="#live_weight_8"></use></svg></div>
         <div class="segDigit"><svg viewBox="0 0 16.73 47.8"><use href="#live_weight_8"></use></svg></div>
         <div class="segDigit"><svg viewBox="0 0 16.73 47.8"><use href="#live_weight_8"></use></svg></div>
@@ -1258,7 +1278,7 @@
         <div class="segDigit"><svg viewBox="0 0 16.73 47.8"><use href="#live_weight_8"></use></svg></div>
       </div>
 
-      <div class="segGroup allOnDigits" id="rec_weight">
+      <div class="segGroup allOnDigits" id="rec_weight_allon">
         <div class="segDigit"><svg viewBox="0 0 13.58 32.47"><use href="#rec_weight_8"></use></svg></div>
         <div class="segDigit"><svg viewBox="0 0 13.58 32.47"><use href="#rec_weight_8"></use></svg></div>
         <div class="segDigit"><svg viewBox="0 0 13.58 32.47"><use href="#rec_weight_8"></use></svg></div>
@@ -1266,7 +1286,7 @@
         <div class="segDigit"><svg viewBox="0 0 13.58 32.47"><use href="#rec_weight_8"></use></svg></div>
       </div>
 
-      <div class="segGroup allOnDigits" id="rec_list">
+      <div class="segGroup allOnDigits" id="rec_list_allon">
         <div class="segDigit"><svg viewBox="0 0 6.37 14.79"><use href="#rec_list_8"></use></svg></div>
         <div class="segDigit"><svg viewBox="0 0 6.37 14.79"><use href="#rec_list_8"></use></svg></div>
       </div>
@@ -1984,7 +2004,6 @@
               </div>
               
             </div>
-            <div class="hotspots" id="hotspots"></div>
 
             </div> <!-- /deviceInner -->
           </div> <!-- /deviceWrap -->
@@ -1998,10 +2017,10 @@
         <div class="row">
           <div class="field">
             <label>重量輸入 (g)</label>
-            <input type="number" placeholder="0" />
+            <input id="weightInput" type="number" placeholder="0" min="0" max="10000" />
           </div>
-          <input type="range" min="0" max="5000" value="0" />
-          <div class="hint">0g / 淨重</div>
+          <input id="weightRange" type="range" min="0" max="10000" value="0" />
+          <div class="hint" id="weightHint">0g / 淨重</div>
         </div>
 
         <div class="row">
@@ -2034,6 +2053,171 @@
         btn.setAttribute('aria-pressed', String(on));
         btn.textContent = on ? 'LCD 全亮（已開）' : 'LCD 一鍵全亮';
       });
+    })();
+
+    (function () {
+      const units = ['g', 'lb:oz', 'lb', 'oz', 'fl.oz', 'ml'];
+      let unitIndex = 0;
+      let rawWeightG = 0;
+
+      const liveDigits = Array.from(document.querySelectorAll('#live_weight .segDigit'));
+      const weightInput = document.getElementById('weightInput');
+      const weightRange = document.getElementById('weightRange');
+      const weightHint = document.getElementById('weightHint');
+
+      const iconIds = [
+        'live_unit_g','live_unit_lb','live_unit_oz','live_unit_fl','live_unit_ml',
+        'live_colon','live_dot01','live_dot02','icon_ingre'
+      ];
+
+      function clampWeight(val) {
+        if (!Number.isFinite(val)) return 0;
+        return Math.max(0, Math.min(10000, Math.round(val)));
+      }
+
+      function setIconOn(id, on) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (on) el.classList.add('on');
+        else el.classList.remove('on');
+      }
+
+      function hideAllLiveIcons() {
+        iconIds.forEach(id => setIconOn(id, false));
+      }
+
+      function setDigitAt(pos, digit, visible) {
+        const el = liveDigits[pos - 1];
+        if (!el) return;
+        if (!visible) {
+          el.style.visibility = 'hidden';
+          el.style.opacity = '0';
+          return;
+        }
+        el.style.visibility = 'visible';
+        el.style.opacity = '1';
+        const use = el.querySelector('use');
+        if (use) use.setAttribute('href', `#live_weight_${digit}`);
+      }
+
+      function clearLiveDigits() {
+        liveDigits.forEach((_, idx) => setDigitAt(idx + 1, 0, false));
+      }
+
+      function renderWeightForUnit(unit) {
+        clearLiveDigits();
+        hideAllLiveIcons();
+        setIconOn('icon_ingre', true);
+
+        if (unit === 'g' || unit === 'ml') {
+          const v = Math.round(rawWeightG);
+          const s = String(v).padStart(1, '0');
+          const chars = s.split('');
+          let pos = 5;
+          for (let i = chars.length - 1; i >= 0 && pos >= 1; i--, pos--) {
+            setDigitAt(pos, Number(chars[i]), true);
+          }
+          setIconOn(unit === 'g' ? 'live_unit_g' : 'live_unit_ml', true);
+          return;
+        }
+
+        if (unit === 'lb:oz') {
+          const totalOz = rawWeightG * 0.035274;
+          const lb = Math.floor(totalOz / 16);
+          const oz = totalOz - lb * 16;
+          const ozOne = Math.floor(oz);
+          const ozTenth = Math.floor((oz - ozOne) * 10);
+
+          if (lb >= 10) {
+            setDigitAt(1, Math.floor(lb / 10) % 10, true);
+            setDigitAt(2, lb % 10, true);
+          } else {
+            setDigitAt(2, lb % 10, true);
+          }
+
+          if (ozOne >= 10) {
+            setDigitAt(3, Math.floor(ozOne / 10) % 10, true);
+            setDigitAt(4, ozOne % 10, true);
+          } else {
+            setDigitAt(4, ozOne % 10, true);
+          }
+          setDigitAt(5, ozTenth, true);
+
+          setIconOn('live_unit_lb', true);
+          setIconOn('live_unit_oz', true);
+          setIconOn('live_colon', true);
+          setIconOn('live_dot02', true);
+          return;
+        }
+
+        if (unit === 'lb') {
+          const lbVal = rawWeightG * 0.00220462;
+          const str = lbVal.toFixed(2); // x.xx
+          const parts = str.split('.');
+          const intDigit = Number(parts[0]) % 10;
+          const dec1 = Number(parts[1][0]);
+          const dec2 = Number(parts[1][1]);
+          setDigitAt(3, intDigit, true);
+          setDigitAt(4, dec1, true);
+          setDigitAt(5, dec2, true);
+          setIconOn('live_unit_lb', true);
+          setIconOn('live_dot01', true);
+          return;
+        }
+
+        if (unit === 'oz' || unit === 'fl.oz') {
+          const ozVal = rawWeightG * 0.035274;
+          const ozOne = Math.floor(ozVal);
+          const ozTenth = Math.floor((ozVal - ozOne) * 10);
+          if (ozOne >= 10) {
+            setDigitAt(3, Math.floor(ozOne / 10) % 10, true);
+            setDigitAt(4, ozOne % 10, true);
+          } else {
+            setDigitAt(4, ozOne % 10, true);
+          }
+          setDigitAt(5, ozTenth, true);
+          if (unit === 'oz') {
+            setIconOn('live_unit_oz', true);
+          } else {
+            setIconOn('live_unit_fl', true);
+            setIconOn('live_unit_oz', true);
+          }
+          setIconOn('live_dot02', true);
+        }
+      }
+
+      function applyUnitDisplay(unit) {
+        renderWeightForUnit(unit);
+      }
+
+      function syncWeight(val) {
+        rawWeightG = clampWeight(val);
+        if (weightInput) weightInput.value = String(rawWeightG);
+        if (weightRange) weightRange.value = String(rawWeightG);
+        if (weightHint) weightHint.textContent = `${rawWeightG}g / 淨重`;
+        applyUnitDisplay(units[unitIndex]);
+      }
+
+      if (weightRange) {
+        weightRange.addEventListener('input', (e) => {
+          syncWeight(Number(e.target.value));
+        });
+      }
+      if (weightInput) {
+        weightInput.addEventListener('input', (e) => {
+          syncWeight(Number(e.target.value));
+        });
+      }
+
+      const rightBottom = document.querySelector('.hotspot[data-id="rightBottom"]');
+      if (rightBottom) {
+        rightBottom.addEventListener('click', () => {
+          unitIndex = (unitIndex + 1) % units.length;
+          applyUnitDisplay(units[unitIndex]);
+        });
+      }
+
+      syncWeight(0);
     })();
   </script>
 </body>
