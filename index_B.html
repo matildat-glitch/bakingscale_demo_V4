@@ -2202,8 +2202,8 @@
             <ul>
               <li><strong>TARE (右上)</strong>: 短按 = 記錄食材 (Add)，長按 1.5s = 歸零 (Stage Tare)</li>
               <li><strong>POWER (右下)</strong>: 短按 = 切換單位，長按 1.5s = 開關機</li>
-              <li><strong>UP (左上)</strong>: 瀏覽 / 長按 1.5s = 切換一般模式</li>
-              <li><strong>DOWN (左下)</strong>: 瀏覽 / 長按 1.5s = 刪除全部</li>
+              <li><strong>UP (左上)</strong>: 瀏覽下一筆 / 長按 1.5s = 切換一般模式</li>
+              <li><strong>DOWN (左下)</strong>: 瀏覽上一筆 / 長按 1.5s = 刪除全部</li>
             </ul>
           </div>
         </div>
@@ -2502,8 +2502,8 @@
             <ul>
               <li><strong>TARE (Upper Right)</strong>: Short press = Add ingredient; Long press 1.5s = Stage Tare</li>
               <li><strong>POWER (Lower Right)</strong>: Short press = Switch unit; Long press 1.5s = Power on/off</li>
-              <li><strong>UP (Upper Left)</strong>: Browse / Long press 1.5s = Toggle normal mode</li>
-              <li><strong>DOWN (Lower Left)</strong>: Browse / Long press 1.5s = Delete all</li>
+              <li><strong>UP (Upper Left)</strong>: Browse next / Long press 1.5s = Toggle normal mode</li>
+              <li><strong>DOWN (Lower Left)</strong>: Browse previous / Long press 1.5s = Delete all</li>
             </ul>
           `;
         } else {
@@ -2514,8 +2514,8 @@
             <ul>
               <li><strong>TARE (右上)</strong>: 短按 = 記錄食材 (Add)，長按 1.5s = 歸零 (Stage Tare)</li>
               <li><strong>POWER (右下)</strong>: 短按 = 切換單位，長按 1.5s = 開關機</li>
-              <li><strong>UP (左上)</strong>: 瀏覽 / 長按 1.5s = 切換一般模式</li>
-              <li><strong>DOWN (左下)</strong>: 瀏覽 / 長按 1.5s = 刪除全部</li>
+              <li><strong>UP (左上)</strong>: 瀏覽下一筆 / 長按 1.5s = 切換一般模式</li>
+              <li><strong>DOWN (左下)</strong>: 瀏覽上一筆 / 長按 1.5s = 刪除全部</li>
             </ul>
           `;
         }
@@ -2833,7 +2833,7 @@
             toggleDeleteChoice();
             return;
           }
-          browseRecord(-1); // UP = previous
+          browseRecord(1); // UP = next
         };
         leftTop.addEventListener('pointerdown', startPress);
         leftTop.addEventListener('pointerup', endPress);
@@ -2868,7 +2868,7 @@
             toggleDeleteChoice();
             return;
           }
-          browseRecord(1); // DOWN = next
+          browseRecord(-1); // DOWN = previous
         };
         leftBottom.addEventListener('pointerdown', startPress);
         leftBottom.addEventListener('pointerup', endPress);
