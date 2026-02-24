@@ -455,6 +455,16 @@
   --w: 1.4%;
 }
 
+#live_minus{
+  /* 放在 icon_reset 下方，可再微調 */
+  --x: 45.7%;
+  --y: 46%;
+  --w: 4%;
+  --ar: 16.73 / 47.8;
+}
+#live_minus{ color:#fefefe; }
+#live_minus svg *{ fill: currentColor; }
+
 #icon_tare00{
   /* ✅ tare icon 會在 fl.oz 左邊一點點 */
   --x: 71.5%;
@@ -1310,6 +1320,11 @@
       <!-- Hidden SVG glyph library for 7-seg digits/letters/icons -->
       <svg class="segGlyphLib" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
         <defs>
+          <symbol id="live_weight_minus" viewBox="0 0 8.35 3.59">
+            <g transform="translate(0 0)">
+              <polygon points="8.35 1.79 6.9 3.25 6.56 3.59 1.79 3.59 1.45 3.25 0 1.79 1.79 0 6.56 0 8.35 1.79"/>
+            </g>
+          </symbol>
           <symbol id="live_weight_0" viewBox="0 0 16.73 47.8">
             <g transform="translate(0 0)">
             <path d="M15.48.91l-2.68,2.68H3.92L1.25.91c.64-.56,1.48-.91,2.4-.91h9.44c.92,0,1.76.35,2.4.91Z"/>
@@ -2059,7 +2074,12 @@
                      <path class="icon-reset-fill" d="M0,1.91v4.34c0,.57.46,1.03,1.03,1.03h4.01c.57,0,1.03-.46,1.03-1.03V1.91H0ZM2.45,6.02h-.74v-2.85h.74v2.85ZM4.36,6.02h-.74v-2.85h.74v2.85Z"/>
                    </g>
                  </g>
-               </svg>
+                </svg>
+              </div>
+              <div class="lcdIcon" id="live_minus">
+                <svg viewBox="0 0 16.73 47.8">
+                  <use href="#live_weight_minus"></use>
+                </svg>
               </div>
               <div class="lcdIcon" id="icon_reset_arrow">
                 <svg viewBox="0 0 5.51 4.64">
@@ -2238,13 +2258,13 @@
         digits.forEach((_, idx) => setDigitAt(digits, idx + 1, 0, false, prefix));
       }
 
-      function renderRightAlignedNumber(digits, prefix, value, maxDigits) {
+      function renderRightAlignedNumber(digits, prefix, value, maxDigits, startPos = 1) {
         clearDigits(digits, prefix);
         const v = Math.round(Math.abs(value));
         const s = String(v).padStart(1, '0');
         const chars = s.split('');
-        let pos = maxDigits;
-        for (let i = chars.length - 1; i >= 0 && pos >= 1; i--, pos--) {
+        let pos = startPos + maxDigits - 1;
+        for (let i = chars.length - 1; i >= 0 && pos >= startPos; i--, pos--) {
           setDigitAt(digits, pos, Number(chars[i]), true, prefix);
         }
       }
@@ -2383,12 +2403,15 @@
       function renderWeightForUnit(unit) {
         clearDigits(liveDigits, 'live_weight');
         hideAllLiveIcons();
+        const isNeg = rawWeightG < 0;
+        const forceShowMinus = false; // show only when negative
 
         const absWeight = Math.abs(rawWeightG);
 
         if (unit === 'g' || unit === 'ml') {
-          renderRightAlignedNumber(liveDigits, 'live_weight', absWeight, 5);
+          renderRightAlignedNumber(liveDigits, 'live_weight', absWeight, 5, 1);
           setIconOn(unit === 'g' ? 'live_unit_g' : 'live_unit_ml', true);
+          setIconOn('live_minus', forceShowMinus || isNeg);
           return;
         }
 
@@ -2398,7 +2421,6 @@
           const oz = totalOz - lb * 16;
           const ozOne = Math.floor(oz);
           const ozTenth = Math.floor((oz - ozOne) * 10);
-
           if (lb >= 10) {
             setDigitAt(liveDigits, 1, Math.floor(lb / 10) % 10, true, 'live_weight');
             setDigitAt(liveDigits, 2, lb % 10, true, 'live_weight');
@@ -2418,6 +2440,7 @@
           setIconOn('live_unit_oz', true);
           setIconOn('live_colon', true);
           setIconOn('live_dot02', true);
+          setIconOn('live_minus', forceShowMinus || isNeg);
           return;
         }
 
@@ -2433,6 +2456,7 @@
           setDigitAt(liveDigits, 5, dec2, true, 'live_weight');
           setIconOn('live_unit_lb', true);
           setIconOn('live_dot01', true);
+          setIconOn('live_minus', forceShowMinus || isNeg);
           return;
         }
 
@@ -2454,6 +2478,7 @@
             setIconOn('live_unit_oz', true);
           }
           setIconOn('live_dot02', true);
+          setIconOn('live_minus', forceShowMinus || isNeg);
         }
       }
 
