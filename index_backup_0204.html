@@ -155,7 +155,7 @@
 #lcd_background{
   position: absolute;
   inset: 0;
-  opacity: .35;
+  opacity: 0;
   display: block;
   pointer-events: none;
   z-index: 1;
@@ -725,6 +725,27 @@
     body.powerOff .lcdSeg,
     body.powerOff .lcdIcons{
       opacity: 0;
+    }
+
+    /* record mode off: dim teal list/ingredient related items */
+    body.recordOff #rec_weight,
+    body.recordOff #rec_list,
+    body.recordOff #rec_line,
+    body.recordOff #rec_unit_g,
+    body.recordOff #rec_unit_lb,
+    body.recordOff #rec_unit_oz,
+    body.recordOff #rec_unit_fl,
+    body.recordOff #rec_unit_ml,
+    body.recordOff #rec_colon,
+    body.recordOff #rec_dot01,
+    body.recordOff #rec_dot02,
+    body.recordOff #icon_ingre,
+    body.recordOff #icon_tare01,
+    body.recordOff #icon_tare02,
+    body.recordOff #icon_tare03,
+    body.recordOff #icon_tare04,
+    body.recordOff #icon_tare05{
+      opacity: 0 !important;
     }
 
     @media (max-width: 980px){
@@ -2244,6 +2265,7 @@
       let isPowerOn = true;
       let deleteMode = false;
       let deleteChoice = 'yes'; // 'yes' | 'no'
+      let recordMode = true; // true = ingredient/recording mode, false = normal mode
 
       function clampWeight(val) {
         if (!Number.isFinite(val)) return 0;
@@ -2430,8 +2452,19 @@
         renderRecord(records[currentViewIndex], true);
       }
 
+      function updateModeUI() {
+        if (recordMode) {
+          setIconOn('icon_ingre', true);
+          setIconOn('icon_tare00', false);
+          document.body.classList.remove('recordOff');
+        } else {
+          setIconOn('icon_ingre', false);
+          document.body.classList.add('recordOff');
+        }
+      }
+
       function enterDeleteMode() {
-        if (records.length === 0) return;
+        if (!recordMode || records.length === 0) return;
         deleteMode = true;
         deleteChoice = 'yes';
         // clear live digits and show YES/NO + reset icons
@@ -2657,6 +2690,7 @@
             setTimeout(() => {
               document.body.classList.remove('lcdAllOn');
               showLatestRecord();
+              updateModeUI();
               applyUnitDisplay(units[unitIndex]);
             }, 1000);
             return;
@@ -2688,7 +2722,7 @@
       }
 
       function recordBowlTare() {
-        if (!isPowerOn || deleteMode) return;
+        if (!isPowerOn || deleteMode || !recordMode) return;
         if (rawWeightG === 0) return;
         if (currentBowlIndex >= 4) return;
         const nextIndex = currentBowlIndex + 1;
@@ -2702,7 +2736,7 @@
       }
 
       function recordIngredient() {
-        if (!isPowerOn || deleteMode) return;
+        if (!isPowerOn || deleteMode || !recordMode) return;
         if (rawWeightG <= 0) return;
         if (currentBowlIndex < 0) return;
         const bowl = bowls[currentBowlIndex];
@@ -2735,7 +2769,7 @@
           didLongPress = false;
           longPressTimer = setTimeout(() => {
             didLongPress = true;
-            recordBowlTare();
+            if (recordMode) recordBowlTare();
           }, 1500);
         };
         const endPress = (e) => {
@@ -2752,7 +2786,18 @@
             longPressTimer = null;
           }
           if (!didLongPress) {
-            recordIngredient();
+            if (recordMode) {
+              recordIngredient();
+            } else {
+              // normal mode: tare zero without recording
+              if (rawWeightG > 20) {
+                setIconOn('icon_tare00', true);
+                syncWeight(0);
+              } else {
+                setIconOn('icon_tare00', false);
+                syncWeight(0);
+              }
+            }
           }
         };
         rightTop.addEventListener('pointerdown', startPress);
@@ -2762,7 +2807,7 @@
       }
 
       function browseRecord(direction) {
-        if (!isPowerOn || deleteMode) return;
+        if (!isPowerOn || deleteMode || !recordMode) return;
         if (records.length === 0) return;
         if (currentViewIndex < 0) currentViewIndex = records.length - 1;
         currentViewIndex = (currentViewIndex + direction + records.length) % records.length;
@@ -2772,13 +2817,42 @@
 
       const leftTop = document.querySelector('.hotspot[data-id="leftTop"]');
       if (leftTop) {
-        leftTop.addEventListener('click', () => {
+        let didLongPress = false;
+        let isPressing = false;
+        let pressStart = 0;
+        const startPress = (e) => {
+          e.preventDefault();
+          if (!isPowerOn || deleteMode) return;
+          if (leftTop.setPointerCapture && e.pointerId != null) {
+            leftTop.setPointerCapture(e.pointerId);
+          }
+          isPressing = true;
+          didLongPress = false;
+          pressStart = Date.now();
+        };
+        const endPress = (e) => {
+          e.preventDefault();
+          if (leftTop.releasePointerCapture && e.pointerId != null) {
+            leftTop.releasePointerCapture(e.pointerId);
+          }
+          if (!isPressing) return;
+          isPressing = false;
+          const duration = Date.now() - pressStart;
+          if (duration >= 2000) {
+            didLongPress = true;
+            recordMode = !recordMode;
+            updateModeUI();
+            return;
+          }
           if (deleteMode) {
             toggleDeleteChoice();
             return;
           }
           browseRecord(-1); // UP = previous
-        });
+        };
+        leftTop.addEventListener('pointerdown', startPress);
+        leftTop.addEventListener('pointerup', endPress);
+        leftTop.addEventListener('pointercancel', endPress);
       }
 
       const leftBottom = document.querySelector('.hotspot[data-id="leftBottom"]');
@@ -2822,9 +2896,9 @@
       isPowerOn = true;
       document.getElementById('live_yes')?.classList.remove('on');
       document.getElementById('live_no')?.classList.remove('on');
-      setIconOn('icon_ingre', true);
       setIconOn('live_minus', false);
       clearRecDisplay();
+      updateModeUI();
       syncWeight(0);
     })();
   </script>
