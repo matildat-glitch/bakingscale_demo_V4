@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Baking scale prototype_V4_B</title>
+  <title>Baking scale prototype_V5_B</title>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dseg@0.46.0/css/dseg.css">
 
@@ -256,7 +256,7 @@
   --h: 20%;
   --digits: 2;
   --gap: 3%;
-  color: #34e6bf;
+  color: #bbff4e;
 }
 
 #rec_weight,
@@ -267,7 +267,7 @@
   --h: 52.5%;
   --digits: 5;
   --gap: 3%;
-  color: #34e6bf;
+  color: #bbff4e;
 }
 
 
@@ -760,7 +760,7 @@
   <div class="page">
 
     <div class="header">
-      <div class="title">Baking scale prototype_V4_B</div>
+      <div class="title">Baking scale prototype_V5_B</div>
     </div>
 
     <div class="main">
@@ -788,7 +788,7 @@
       }
 
       .cls-4 {
-        fill: #34e6bf;
+        fill: #bbff4e;
       }
 
       .cls-5 {
@@ -984,7 +984,7 @@
       }
 
       #lcdBgSvg .cls-3 {
-        fill: #34e6bf;
+        fill: #bbff4e;
       }
 
       #lcdBgSvg .cls-4 {
@@ -1862,7 +1862,7 @@
                  <defs>
                    <style>
                      .rec-uniy-lb-fill {
-                       fill: #34e6bf;
+                       fill: #bbff4e;
                      }
                    </style>
                  </defs>
@@ -1880,7 +1880,7 @@
                  <defs>
                    <style>
                      .rec-unit-fl-fill {
-                       fill: #34e6bf;
+                       fill: #bbff4e;
                      }
                    </style>
                  </defs>
@@ -1899,7 +1899,7 @@
                  <defs>
                    <style>
                      .rec-unit-oz-fill {
-                       fill: #34e6bf;
+                       fill: #bbff4e;
                      }
                    </style>
                  </defs>
@@ -1917,7 +1917,7 @@
                  <defs>
                    <style>
                      .rec-unit-g-fill {
-                       fill: #34e6bf;
+                       fill: #bbff4e;
                      }
                    </style>
                  </defs>
@@ -1932,7 +1932,7 @@
                  <defs>
                    <style>
                      .rec-unit-ml-fill {
-                       fill: #34e6bf;
+                       fill: #bbff4e;
                      }
                    </style>
                  </defs>
@@ -1950,7 +1950,7 @@
                  <defs>
                    <style>
                      .rec-colon-fill {
-                       fill: #34e6bf;
+                       fill: #bbff4e;
                      }
                    </style>
                  </defs>
@@ -1968,7 +1968,7 @@
                  <defs>
                    <style>
                      .rec-dot01-fill {
-                       fill: #34e6bf;
+                       fill: #bbff4e;
                      }
                    </style>
                  </defs>
@@ -1982,7 +1982,7 @@
                  <defs>
                    <style>
                      .rec-dot02-fill {
-                       fill: #34e6bf;
+                       fill: #bbff4e;
                      }
                    </style>
                  </defs>
@@ -1996,7 +1996,7 @@
                  <defs>
                    <style>
                      .rec-line-fill {
-                       fill: #34e6bf;
+                       fill: #bbff4e;
                      }
                    </style>
                  </defs>
@@ -2010,7 +2010,7 @@
                  <defs>
                    <style>
                      .icon-ingre-fill {
-                       fill: #34e6bf;
+                       fill: #bbff4e;
                      }
                    </style>
                  </defs>
@@ -2198,9 +2198,9 @@
 
         <div class="row">
           <div class="hint" id="opGuide">
-            <strong>操作說明 (V4)：</strong>
+            <strong>操作說明 (V5)：</strong>
             <ul>
-              <li><strong>TARE (右上)</strong>: 短按 = 記錄食材 (Add)，長按 1.5s = 歸零 (Stage Tare)</li>
+              <li><strong>TARE (右上)</strong>: 記錄模式短按 = 記錄食材、長按 1.5s = Stage Tare；基本模式長短按皆歸零</li>
               <li><strong>POWER (右下)</strong>: 短按 = 切換單位，長按 1.5s = 開關機</li>
               <li><strong>UP (左上)</strong>: 瀏覽下一筆 / 長按 1.5s = 切換一般模式</li>
               <li><strong>DOWN (左下)</strong>: 瀏覽上一筆 / 長按 1.5s = 刪除全部</li>
@@ -2238,7 +2238,7 @@
       const tareIds = ['icon_tare01','icon_tare02','icon_tare03','icon_tare04','icon_tare05'];
 
       const bowls = []; // { tareWeight: number, items: number[] }
-      const records = []; // { type:'bowl'|'item', bowlIndex:number, itemIndex?:number, weight?:number, unit?:string }
+      const records = []; // { type:'item', bowlIndex:number, itemIndex:number, weight:number, unit:string }
       let currentBowlIndex = -1;
       let currentViewIndex = -1;
       let isPowerOn = true;
@@ -2434,7 +2434,6 @@
       function updateModeUI() {
         if (recordMode) {
           setIconOn('icon_ingre', true);
-          setIconOn('icon_tare00', false);
           document.body.classList.remove('recordOff');
         } else {
           setIconOn('icon_ingre', false);
@@ -2498,9 +2497,9 @@
           if (panelTitle) panelTitle.textContent = 'Weight Simulation';
           if (weightLabel) weightLabel.textContent = 'Weight Input (g)';
           opGuide.innerHTML = `
-            <strong>Operation Guide (V4):</strong>
+            <strong>Operation Guide (V5):</strong>
             <ul>
-              <li><strong>TARE (Upper Right)</strong>: Short press = Add ingredient; Long press 1.5s = Stage Tare</li>
+              <li><strong>TARE (Upper Right)</strong>: In record mode, short press = Add ingredient and long press 1.5s = Stage Tare; in normal mode, both short and long press zero the scale</li>
               <li><strong>POWER (Lower Right)</strong>: Short press = Switch unit; Long press 1.5s = Power on/off</li>
               <li><strong>UP (Upper Left)</strong>: Browse next / Long press 1.5s = Toggle normal mode</li>
               <li><strong>DOWN (Lower Left)</strong>: Browse previous / Long press 1.5s = Delete all</li>
@@ -2510,9 +2509,9 @@
           if (panelTitle) panelTitle.textContent = '重量模擬';
           if (weightLabel) weightLabel.textContent = '重量輸入 (g)';
           opGuide.innerHTML = `
-            <strong>操作說明 (V4)：</strong>
+            <strong>操作說明 (V5)：</strong>
             <ul>
-              <li><strong>TARE (右上)</strong>: 短按 = 記錄食材 (Add)，長按 1.5s = 歸零 (Stage Tare)</li>
+              <li><strong>TARE (右上)</strong>: 記錄模式短按 = 記錄食材、長按 1.5s = Stage Tare；基本模式長短按皆歸零</li>
               <li><strong>POWER (右下)</strong>: 短按 = 切換單位，長按 1.5s = 開關機</li>
               <li><strong>UP (左上)</strong>: 瀏覽下一筆 / 長按 1.5s = 切換一般模式</li>
               <li><strong>DOWN (左下)</strong>: 瀏覽上一筆 / 長按 1.5s = 刪除全部</li>
@@ -2695,7 +2694,7 @@
             setIconDim(id, false);
           } else if (hasBowl) {
             setIconOn(id, false);
-            setIconDim(id, true);
+            setIconDim(id, false);
           } else {
             setIconOn(id, false);
             setIconDim(id, false);
@@ -2711,9 +2710,6 @@
         bowls[nextIndex] = { tareWeight: rawWeightG, items: [] };
         currentBowlIndex = nextIndex;
         setActiveBowl(currentBowlIndex);
-        records.push({ type: 'bowl', bowlIndex: currentBowlIndex });
-        currentViewIndex = records.length - 1;
-        renderRecord(records[currentViewIndex], true);
         syncWeight(0);
       }
 
@@ -2724,7 +2720,7 @@
         const bowl = bowls[currentBowlIndex];
         if (!bowl) return;
         bowl.items.push(rawWeightG);
-        const itemIndex = bowl.items.length;
+        const itemIndex = records.length + 1;
         records.push({
           type: 'item',
           bowlIndex: currentBowlIndex,
@@ -2751,7 +2747,11 @@
           didLongPress = false;
           longPressTimer = setTimeout(() => {
             didLongPress = true;
-            if (recordMode) recordBowlTare();
+            if (recordMode) {
+              recordBowlTare();
+            } else {
+              syncWeight(0);
+            }
           }, 1500);
         };
         const endPress = (e) => {
@@ -2772,13 +2772,7 @@
               recordIngredient();
             } else {
               // normal mode: tare zero without recording
-              if (rawWeightG > 20) {
-                setIconOn('icon_tare00', true);
-                syncWeight(0);
-              } else {
-                setIconOn('icon_tare00', false);
-                syncWeight(0);
-              }
+              syncWeight(0);
             }
           }
         };
@@ -2792,7 +2786,9 @@
         if (!isPowerOn || deleteMode || !recordMode) return;
         if (records.length === 0) return;
         if (currentViewIndex < 0) currentViewIndex = records.length - 1;
-        currentViewIndex = (currentViewIndex + direction + records.length) % records.length;
+        const nextIndex = currentViewIndex + direction;
+        if (nextIndex < 0 || nextIndex >= records.length) return;
+        currentViewIndex = nextIndex;
         const isLatest = currentViewIndex === records.length - 1;
         renderRecord(records[currentViewIndex], isLatest);
       }
