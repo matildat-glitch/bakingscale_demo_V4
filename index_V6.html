@@ -620,9 +620,9 @@
 }
 
 #rec_line{
-  --x: 39%;  
+  --x: 39.1%;  
   --y: 30.8%;   
-  --w: 6%;   
+  --w: 7.1%;   
 }
 
 
@@ -907,6 +907,11 @@
     body.chargingMode:not(.powerOff) #icon_charging.on,
     body.chargingMode:not(.powerOff) #icon_battery.on{
       opacity: 1 !important;
+    }
+
+    /* delete mode: dim live dots */
+    body.deleteMode #live_dots .dot.on{
+      opacity: 0;
     }
 
     /* power off */
@@ -1914,7 +1919,7 @@
                    </style>
                  </defs>
                  <g>
-                   <rect class="rec-line-fill" width="14.17" height="1.64"/>
+                   <rect class="rec-line-fill" y="0.32" width="14.17" height="1"/>
                  </g>
                </svg>
               </div>
@@ -2141,6 +2146,7 @@
             <p>The Weight Input area simulates real weighing conditions, and each added weight can be selected and removed individually.</p>
             <ul>
               <li><strong>TARE</strong>: In record mode, short press = Add ingredient; long press 1.5s = Tare as bowls. In normal mode, any press zeros the scale.</li>
+              <li><strong>Record limit rule</strong>: When <code>icon_tare05</code> is lit, long press TARE has no effect (all tare icons 01-05 are already used).</li>
               <li><strong>POWER</strong>: short press switch unit / long press power off</li>
               <li><strong>UP</strong>: Browse next / Long press 1.5s = Toggle normal mode</li>
               <li><strong>DOWN</strong>: Browse previous / Long press 1.5s = Delete records</li>
@@ -2621,8 +2627,10 @@
       }
 
       function enterDeleteMode() {
-        if (!recordMode || records.length === 0) return;
+        // Allow delete mode as soon as the first tare bowl is available (icon_tare01 on).
+        if (!recordMode || currentBowlIndex < 0) return;
         deleteMode = true;
+        document.body.classList.add('deleteMode');
         deleteChoice = 'yes';
         // clear live digits and show YES/NO + reset icons
         clearDigits(liveDigits, 'live_weight');
@@ -2636,6 +2644,7 @@
 
       function exitDeleteMode(showLatest) {
         deleteMode = false;
+        document.body.classList.remove('deleteMode');
         document.getElementById('live_yes')?.classList.remove('on');
         document.getElementById('live_no')?.classList.remove('on');
         setIconOn('icon_reset', false);
@@ -2925,11 +2934,18 @@
           if (deleteMode) return;
           didLongPress = false;
           longPressTimer = setTimeout(() => {
-            didLongPress = true;
             if (recordMode) {
+              // When tare05 is already active, all tare slots are used.
+              // Long-press TARE should be consumed but perform no action.
+              if (currentBowlIndex >= 4) {
+                didLongPress = true;
+                return;
+              }
+              didLongPress = true;
               // Preserve V6 behavior: long-press TARE in record mode advances tare stage icon.
               recordBowlTare();
             } else {
+              didLongPress = true;
               applyTareFromCurrentPlate();
             }
           }, 1500);
@@ -2984,12 +3000,15 @@
         let isPressing = false;
         const startPress = (e) => {
           e.preventDefault();
-          if (!isPowerOn || deleteMode) return;
+          if (!isPowerOn) return;
           if (leftTop.setPointerCapture && e.pointerId != null) {
             leftTop.setPointerCapture(e.pointerId);
           }
           isPressing = true;
           didLongPress = false;
+          // In delete mode, UP should only toggle YES/NO on short press.
+          // Do not start long-press timer (which toggles record mode).
+          if (deleteMode) return;
           longPressTimer = setTimeout(() => {
             if (!isPressing) return;
             didLongPress = true;
@@ -3056,7 +3075,7 @@
         leftBottom.addEventListener('pointercancel', endPress);
       }
 
-      document.body.classList.remove('lcdAllOn', 'chargingMode');
+      document.body.classList.remove('lcdAllOn', 'chargingMode', 'deleteMode');
       document.body.classList.add('powerOff');
       deleteMode = false;
       isPowerOn = false;
