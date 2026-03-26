@@ -953,7 +953,7 @@
   <div class="page">
 
     <div class="header">
-      <div class="title">Baking scale prototype_V6_B</div>
+      <div class="title">Baking scale prototype_V6_mode</div>
     </div>
 
     <div class="main">
@@ -2148,7 +2148,7 @@
               <li><strong>TARE</strong>: In record mode, short press = Add ingredient; long press 1.5s = Tare as bowls. In normal mode, any press zeros the scale.</li>
               <li><strong>Record limit rule</strong>: When <code>icon_tare05</code> is lit, long press TARE has no effect (all tare icons 01-05 are already used).</li>
               <li><strong>POWER</strong>: short press switch unit / long press power off</li>
-              <li><strong>UP</strong>: Browse next / Long press 1.5s = Toggle normal mode</li>
+              <li><strong>UP</strong>: Browse next / Long press 1.5s = Toggle normal mode (if records + tare exist, show YES/NO confirm first)</li>
               <li><strong>DOWN</strong>: Browse previous / Long press 1.5s = Delete records</li>
             </ul>
           </div>
@@ -2193,6 +2193,7 @@
       let isPowerOn = true;
       let deleteMode = false;
       let deleteChoice = 'yes'; // 'yes' | 'no'
+      let deleteModeAction = 'delete'; // 'delete' | 'toNormal'
       let recordMode = true; // true = ingredient/recording mode, false = normal mode
       const plateWeights = []; // { id:number, grams:number }
       let selectedWeightId = null;
@@ -2626,10 +2627,11 @@
         }
       }
 
-      function enterDeleteMode() {
-        // Allow delete mode as soon as the first tare bowl is available (icon_tare01 on).
+      function enterDeleteMode(action = 'delete') {
+        // Allow delete/confirm mode as soon as the first tare bowl is available (icon_tare01 on).
         if (!recordMode || currentBowlIndex < 0) return;
         deleteMode = true;
+        deleteModeAction = action;
         document.body.classList.add('deleteMode');
         deleteChoice = 'yes';
         // clear live digits and show YES/NO + reset icons
@@ -2665,6 +2667,21 @@
       }
 
       function confirmDeleteChoice() {
+        if (deleteModeAction === 'toNormal') {
+          if (deleteChoice === 'yes') {
+            bowls.length = 0;
+            records.length = 0;
+            currentBowlIndex = -1;
+            currentViewIndex = -1;
+            setActiveBowl(currentBowlIndex);
+            clearRecDisplay();
+          }
+          exitDeleteMode(false);
+          recordMode = false;
+          updateModeUI();
+          return;
+        }
+
         if (deleteChoice === 'yes') {
           bowls.length = 0;
           records.length = 0;
@@ -2676,6 +2693,13 @@
         } else {
           exitDeleteMode(true);
         }
+      }
+
+      function shouldConfirmBeforeNormalMode() {
+        if (!recordMode) return false;
+        const hasRecListValue = records.length > 0;
+        const hasTareIconOn = currentBowlIndex >= 0;
+        return hasRecListValue && hasTareIconOn;
       }
 
 
@@ -3012,7 +3036,16 @@
           longPressTimer = setTimeout(() => {
             if (!isPressing) return;
             didLongPress = true;
-            recordMode = !recordMode;
+            if (recordMode) {
+              if (shouldConfirmBeforeNormalMode()) {
+                enterDeleteMode('toNormal');
+              } else {
+                recordMode = false;
+                updateModeUI();
+              }
+              return;
+            }
+            recordMode = true;
             updateModeUI();
           }, 1500);
         };
