@@ -2145,11 +2145,10 @@
             <strong>Operation Guide (V6):</strong>
             <p>The Weight Input area simulates real weighing conditions, and each added weight can be selected and removed individually.</p>
             <ul>
-              <li><strong>TARE</strong>: In record mode, short press = Add ingredient; long press 1.5s = Tare as bowls. In normal mode, any press zeros the scale.</li>
-              <li><strong>Record limit rule</strong>: When <code>icon_tare05</code> is lit, long press TARE has no effect (all tare icons 01-05 are already used).</li>
+              <li><strong>TARE</strong>: In record mode, short press = Add ingredient; long press 1s = Tare as bowls.</li>
               <li><strong>POWER</strong>: short press switch unit / long press power off</li>
-              <li><strong>UP</strong>: Browse next / Long press 1.5s = Toggle normal mode (if records + tare exist, show YES/NO confirm first)</li>
-              <li><strong>DOWN</strong>: Browse previous / Long press 1.5s = Delete records</li>
+              <li><strong>UP</strong>: Browse next / Long press 1s = Toggle normal mode</li>
+              <li><strong>DOWN</strong>: Browse previous / Long press 1s = Delete records</li>
             </ul>
           </div>
         </div>
@@ -2638,7 +2637,7 @@
         clearDigits(liveDigits, 'live_weight');
         hideAllLiveIcons();
         setIconOn('live_minus', false);
-        setIconOn('icon_reset', true);
+        setIconOn('icon_reset', action !== 'toNormal');
         setIconOn('icon_reset_arrow', true);
         document.getElementById('live_yes')?.classList.add('on');
         document.getElementById('live_no')?.classList.remove('on');
@@ -2675,9 +2674,14 @@
             currentViewIndex = -1;
             setActiveBowl(currentBowlIndex);
             clearRecDisplay();
+            exitDeleteMode(false);
+            recordMode = false;
+            updateModeUI();
+            return;
           }
-          exitDeleteMode(false);
-          recordMode = false;
+          // Choosing NO cancels normal-mode transition and stays in record mode.
+          exitDeleteMode(true);
+          recordMode = true;
           updateModeUI();
           return;
         }
@@ -2857,7 +2861,7 @@
             stopChargingMode();
             isPowerOn = false;
             document.body.classList.add('powerOff');
-          }, 1500);
+          }, 1000);
         };
         const endPress = (e) => {
           e.preventDefault();
@@ -2911,6 +2915,18 @@
 
       function recordBowlTare() {
         if (!isPowerOn || deleteMode || !recordMode) return;
+        // First long-press creates tare01. After that, only advance to next tare
+        // icon when current bowl already has at least one recorded ingredient.
+        if (currentBowlIndex >= 0) {
+          const currentBowl = bowls[currentBowlIndex];
+          const hasRecordedIngredient = !!currentBowl && currentBowl.items.length > 0;
+          if (!hasRecordedIngredient) {
+            setActiveBowl(currentBowlIndex);
+            clearRecDisplay();
+            applyTareFromCurrentPlate();
+            return;
+          }
+        }
         if (currentBowlIndex >= 4) return;
         const nextIndex = currentBowlIndex + 1;
         bowls[nextIndex] = { tareWeight: rawWeightG, items: [] };
@@ -2966,13 +2982,14 @@
                 return;
               }
               didLongPress = true;
-              // Preserve V6 behavior: long-press TARE in record mode advances tare stage icon.
+              // In record mode, long-press TARE only advances after current bowl
+              // has at least one short-press ingredient record.
               recordBowlTare();
             } else {
               didLongPress = true;
               applyTareFromCurrentPlate();
             }
-          }, 1500);
+          }, 1000);
         };
         const endPress = (e) => {
           e.preventDefault();
@@ -3047,7 +3064,7 @@
             }
             recordMode = true;
             updateModeUI();
-          }, 1500);
+          }, 1000);
         };
         const endPress = (e) => {
           e.preventDefault();
@@ -3085,7 +3102,7 @@
           longPressTimer = setTimeout(() => {
             didLongPress = true;
             enterDeleteMode();
-          }, 1500);
+          }, 1000);
         };
         const endPress = (e) => {
           e.preventDefault();
